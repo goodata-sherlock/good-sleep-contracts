@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL3.0
-pragma solidity >=0.8.0;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
@@ -12,6 +12,20 @@ contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable {
     uint256 private _currentTokenId = 0;
 
     constructor() ERC721("Good Sleep Avatar Collection", "GSA") {}
+
+    function createAvatar() public {
+        createAvatar("");
+    }
+
+    function createAvatar(bytes memory _data) internal {
+        uint256 tokenId = _getNextTokenId();
+        _safeMint(msg.sender, tokenId, _data);
+        _incrementTokenId();
+    }
+
+    function _baseURI() internal view virtual override(ERC721) returns (string memory) {
+        return "www.goodata.io/metadata/sleepdata";
+    }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
@@ -37,6 +51,7 @@ contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable {
      */
     function safeMint() public {
         _safeMint(msg.sender, _getNextTokenId(), "");
+        _incrementTokenId();
     }
 
     /**
@@ -45,6 +60,7 @@ contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable {
      */
     function safeMint(bytes memory _data) internal {
         _safeMint(msg.sender, _getNextTokenId(), _data);
+        _incrementTokenId();
     }
     
     /**
