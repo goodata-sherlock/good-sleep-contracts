@@ -7,7 +7,7 @@ contract SleepAvatar is Avatar {
     using Strings for uint256;
     using SafeMath for uint256;
 
-    constructor() Avatar("Good Sleep Avatar Collection", "GSA") {}
+    constructor(address trustedForwarder) Avatar("Good Sleep Avatar Collection", "GSA", trustedForwarder) {}
 
     function _reward(uint256 tokenId) public view override returns(uint256) {
         // TODO: implement

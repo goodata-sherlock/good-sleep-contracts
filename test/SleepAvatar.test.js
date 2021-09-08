@@ -27,10 +27,6 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
     let avatarContract
     let metaTxContract
     before(async () => {
-        this.avatar = await SleepAvatar.new({ from: dev })
-        this.avatar.transferOwnership(backend, { from: dev })
-        avatarContract = new web3.eth.Contract(SleepAvatar.abi, this.avatar.address)
-
         this.metaTx = await MetaTx.new({ from: dev })
         this.domain = {
             name,
@@ -50,6 +46,10 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
             ],
         };
         metaTxContract = new web3.eth.Contract(MetaTx.abi, this.metaTx.address)
+
+        this.avatar = await SleepAvatar.new(this.metaTx.address, { from: dev })
+        this.avatar.transferOwnership(backend, { from: dev })
+        avatarContract = new web3.eth.Contract(SleepAvatar.abi, this.avatar.address)
     })
 
     let aliceAvatarId
@@ -92,45 +92,45 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
     it('Bob delegates backend to feed avatars', async() => {
         let oldBackend = backend
         let wallet = Wallet.generate()
-        backend = web3.utils.toChecksumAddress(wallet.getAddressString());
+        backend = web3.utils.toChecksumAddress(wallet.getAddressString())
         await this.avatar.transferOwnership(backend, { from: oldBackend })
         let feedMethod = avatarContract.methods.feed(bobAvatarId, toWei('1'))
-        let gas = await feedMethod.estimateGas({ from: backend })
-        let data = feedMethod.encodeABI()
-        let nonce = await web3.eth.getTransactionCount(backend)
-
-        let req = {
-            from: backend,
-            to: this.avatar.address,
-            value: '0',
-            gas: gas,
-            nonce: nonce,
-            data: data,
-        }
-
-        let digest = await this.metaTx.digest(req)
-        let signature = ethSigUtil.signTypedMessage(
-            wallet.getPrivateKey(),
-            {
-                data: {
-                  types: this.types,
-                  domain: this.domain,
-                  primaryType: 'ForwardRequest',
-                  message: req,
-                },
-            },
-        )
-        console.log('backend: ', backend)
-        console.log('req: ', JSON.stringify(req))
-        // console.log('digest: ', digest)
-        // console.log('signature: ', signature)
-        assert.equal(await this.metaTx.verify(req, signature), true)
-        let result = await metaTxContract.methods.mustExecute(req, signature).call({ from: bob })
-        // let metaTxReceipt = await this.metaTx.execute(req, signature, { from: bob })
-        // console.log(metaTxReceipt)
+        let [returndata, receipt] = await mustExecuteMetaTx(wallet, bob, metaTxContract, feedMethod, this.avatar.address, '0', this.types, this.domain)
+        console.log('returndata: ', returndata)
+        console.log('receipt: ', receipt)
+        assert.equal((await this.avatar.records(bobAvatarId)).toString(), toWei('1'))
     })
 })
 
-// const prepare = async (wallet, method, ) => {
+const mustExecuteMetaTx = async (wallet, delegatorAddr,metaTxContract, method, to, value, types, domain) => {
+    let fromAddr = web3.utils.toChecksumAddress(wallet.getAddressString())
+    let gas = await method.estimateGas({ from: fromAddr })
+    let data = method.encodeABI()
+    let nonce = await web3.eth.getTransactionCount(fromAddr)
 
-// }
+    let req = {
+        from: fromAddr,
+        to: web3.utils.toChecksumAddress(to),
+        value: value,
+        gas: gas,
+        nonce: Number(nonce),
+        data: data,
+    }
+
+    let signature = ethSigUtil.signTypedMessage(
+        wallet.getPrivateKey(),
+        {
+            data: {
+              types: types,
+              domain: domain,
+              primaryType: 'ForwardRequest',
+              message: req,
+            },
+        },
+    )
+
+    let returnData = await metaTxContract.methods.mustExecute(req, signature).call({ from: delegatorAddr })
+    let receipt = await metaTxContract.methods.mustExecute(req, signature).send({ from: delegatorAddr })
+
+    return [returnData, receipt]
+}
