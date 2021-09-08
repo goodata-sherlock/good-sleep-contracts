@@ -8,20 +8,21 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-// TODO: import "./ISleepAvatar.sol";
+import "./ISleepAvatar.sol";
 
-contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
+contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable, ISleepAvatar, Ownable {
     using Strings for uint256;
     using SafeMath for uint256;
 
     uint256 private _currentTokenId = 0;
     // tokenId => the number of records
-    mapping (uint256 => uint256) records;
-    mapping (uint256 => uint256) lastRewardRecords;
+    mapping (uint256 => uint256) public override records;
+    mapping (uint256 => uint256) public override lastRewardRecords;
+    uint256 public override multiplier;
 
     constructor() ERC721("Good Sleep Avatar Collection", "GSA") {}
 
-    function createAvatar() public {
+    function createAvatar() public override {
         createAvatar("");
     }
 
@@ -32,9 +33,33 @@ contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
         setTokenURI(tokenId, _appendStr(_baseURI(), tokenId.toString()));
     }
 
-    function feed(uint256 tokenId, uint256 amount) public onlyOwner {
+    function feed(uint256 tokenId, uint256 amount) public onlyOwner override {
         require(_exists(tokenId), "SleepAvatar: Feed on nonexistent avatar");
         records[tokenId] += amount;
+        emit Feeding(tokenId, amount);
+    }
+
+    function batchFeed(FeedParam[] memory params) public onlyOwner override {
+        // TODO: implement
+        for (uint256 i = 0; i < params.length; i++) {
+            FeedParam memory param = params[i];
+            feed(param.tokenId, param.amount);
+        }
+    }
+
+    function reward(uint256 tokenId) public view override returns(uint256) {
+        // TODO: implement
+        return records[tokenId];
+    }
+
+    function setMultiplier(uint256 _multiplier) public override {
+        multiplier = _multiplier;
+    }
+
+    function withdraw(uint256 tokenId) public override returns(uint256) {
+        // TODO: implement
+        lastRewardRecords[tokenId] = records[tokenId];
+        return 0;
     }
 
     function _baseURI() internal view virtual override(ERC721) returns (string memory) {
