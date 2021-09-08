@@ -4,16 +4,20 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 // TODO: import "./ISleepAvatar.sol";
 
-contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable {
+contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     using Strings for uint256;
     using SafeMath for uint256;
 
     uint256 private _currentTokenId = 0;
+    // tokenId => the number of records
+    mapping (uint256 => uint256) records;
+    mapping (uint256 => uint256) lastRewardRecords;
 
     constructor() ERC721("Good Sleep Avatar Collection", "GSA") {}
 
@@ -26,6 +30,11 @@ contract SleepAvatar is ERC721, ERC721URIStorage, ERC721Burnable {
         _safeMint(msg.sender, tokenId, _data);
         _incrementTokenId();
         setTokenURI(tokenId, _appendStr(_baseURI(), tokenId.toString()));
+    }
+
+    function feed(uint256 tokenId, uint256 amount) public onlyOwner {
+        require(_exists(tokenId), "SleepAvatar: Feed on nonexistent avatar");
+        records[tokenId] += amount;
     }
 
     function _baseURI() internal view virtual override(ERC721) returns (string memory) {
