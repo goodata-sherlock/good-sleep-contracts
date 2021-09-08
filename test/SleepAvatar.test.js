@@ -1,6 +1,13 @@
 const { assert } = require("chai")
 const testUtils = require('./utils')
+
+const {
+    expectRevert,
+    time
+} = require('@openzeppelin/test-helpers');
+
 const SleepAvatar = artifacts.require('SleepAvatar')
+const MetaTx = artifacts.require('MetaTx')
 
 const { toWei, fromWei } = web3.utils
 
@@ -8,6 +15,8 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
     before(async () => {
         this.avatar = await SleepAvatar.new({ from: dev })
         this.avatar.transferOwnership(backend, { from: dev })
+
+        this.metaTx = await MetaTx.new({ from: dev });
     })
 
     let aliceAvatarId
@@ -38,5 +47,16 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
         const feedEventArgs = testUtils.getEventArgsFromTx(feedReceipt, 'Feeding')
         assert.equal(feedEventArgs.tokenId.toString(), '1')
         assert.equal(feedEventArgs.amount.toString(), toWei('1').toString())
+    })
+
+    it('Feed avatars without power', async() => {
+        await expectRevert(
+            this.avatar.feed(bobAvatarId, toWei('1'), { from: bob }),
+            'Ownable: caller is not the owner'
+        )
+    })
+
+    it('Bob delegates backend to feed avatars', async() => {
+        // console.log(this.metaTx.execute)
     })
 })
