@@ -34,7 +34,7 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, O
     }
 
     function feed(uint256 tokenId, uint256 amount) public virtual onlyOwner override {
-        require(_exists(tokenId), "Avatar: Feed on nonexistent avatar");
+        require(_exists(tokenId), "Avatar: Feed nonexistent avatar");
         records[tokenId] += amount;
         emit Feeding(tokenId, amount);
     }
