@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 
-// interface ISleepAvatar is IERC721, IERC721Metadata {
-interface ISleepAvatar {
+// interface IAvatar is IERC721, IERC721Metadata {
+interface IAvatar {
     event ServiceAddrUpdated(address indexed oldAddr, address indexed newAddr);
     event Feeding(uint256 tokenId, uint256 amount);
     event MultiplierUpdated(uint256 oldMultiplier, uint256 newMultiplier);
