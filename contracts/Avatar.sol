@@ -84,8 +84,8 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, O
         return ERC721URIStorage.tokenURI(tokenId);
     }
 
-    function setTokenURI(uint256 tokenId, string memory uri) public virtual {
-        require(_isApprovedOrOwner(_msgSender(), tokenId));
+    function setTokenURI(uint256 tokenId, string memory uri) public virtual override {
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "Avatar: no power");
         return _setTokenURI(tokenId, uri);
     }
     
@@ -99,7 +99,7 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, O
      *
      * Emits a {Transfer} event.
      */
-    function safeMint() public virtual {
+    function safeMint() public virtual override {
         _safeMint(_msgSender(), _getNextTokenId(), "");
         _incrementTokenId();
     }
@@ -111,6 +111,10 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, O
     function safeMint(bytes memory _data) internal virtual {
         _safeMint(_msgSender(), _getNextTokenId(), _data);
         _incrementTokenId();
+    }
+
+    function burn(uint256 tokenId) public virtual override(ERC721Burnable, IAvatar) {
+        ERC721Burnable.burn(tokenId);
     }
     
     /**

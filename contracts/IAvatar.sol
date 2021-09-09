@@ -16,9 +16,9 @@ interface IAvatar {
         uint256 amount;
     }
 
-    // function setTokenURI(uint256 tokenId, string memory uri) external;
-    // function safeMint() external;
-    // function burn(uint256 tokenId) external;
+    function setTokenURI(uint256 tokenId, string memory uri) external;
+    function safeMint() external;
+    function burn(uint256 tokenId) external;
 
     function createAvatar() external;
     function feed(uint256 tokenId, uint256 amount) external;
