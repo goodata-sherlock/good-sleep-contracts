@@ -89,6 +89,7 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
         )
     })
 
+    // It must be the last one case.
     it('Bob delegates backend to feed avatars', async() => {
         let oldBackend = backend
         let wallet = Wallet.generate()

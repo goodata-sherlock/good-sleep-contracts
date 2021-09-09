@@ -9,12 +9,12 @@ contract SleepAvatar is Avatar {
 
     constructor(address trustedForwarder) Avatar("Good Sleep Avatar Collection", "GSA", trustedForwarder) {}
 
-    function _reward(uint256 tokenId) public view override returns(uint256) {
+    function _reward(uint256 tokenId) public virtual view override returns(uint256) {
         // TODO: implement
         return records[tokenId];
     }
 
-    function _withdraw(uint256 tokenId) public override returns(uint256) {
+    function _withdraw(uint256 tokenId) public virtual override returns(uint256) {
         // TODO: implement
         lastRewardRecords[tokenId] = records[tokenId];
         return 0;
