@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./IAvatar.sol";
 
+// MUST inherit ERC2771Context for supporting meta tx.
 abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, Ownable, ERC2771Context {
     using Strings for uint256;
     using SafeMath for uint256;
@@ -19,7 +20,7 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, O
     // tokenId => the number of records
     mapping (uint256 => uint256) public override records;
     mapping (uint256 => uint256) public override lastRewardRecords;
-    uint256 public override multiplier;
+    uint256 public override multiplier = 10**18;
 
     constructor(
         string memory name,

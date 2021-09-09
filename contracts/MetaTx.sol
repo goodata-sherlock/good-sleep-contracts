@@ -6,6 +6,10 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
 /**
+ * This file copy from openzeppelin, and make some changes.
+ */
+
+/**
  * @dev Simple minimal forwarder to be used together with an ERC2771 compatible contract. See {ERC2771Context}.
  */
 contract MetaTx is EIP712 {
@@ -56,6 +60,9 @@ contract MetaTx is EIP712 {
         return (success, returndata);
     }
 
+    /**
+     * @dev executes req. Revert when req execution fails.
+     */
     function mustExecute(ForwardRequest calldata req, bytes calldata signature)
         public
         payable
