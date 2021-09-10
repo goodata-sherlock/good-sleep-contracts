@@ -95,6 +95,8 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
         let wallet = Wallet.generate()
         backend = web3.utils.toChecksumAddress(wallet.getAddressString())
         await this.avatar.transferOwnership(backend, { from: oldBackend })
+        assert.equal((await this.avatar.records(bobAvatarId)).toString(), '0')
+
         let feedMethod = avatarContract.methods.feed(bobAvatarId, toWei('1'))
         let [returndata, receipt] = await mustExecuteMetaTx(wallet, bob, metaTxContract, feedMethod, this.avatar.address, '0', this.types, this.domain)
         console.log('returndata: ', returndata)
