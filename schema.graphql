@@ -1,0 +1,4 @@
+type Avatar @entity {
+  id: ID!
+  currentOwner: Address!
+}
