@@ -13,10 +13,8 @@ const SleepAvatar = artifacts.require('SleepAvatar')
 const { toWei, fromWei } = web3.utils
 
 contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
-    let avatarContract
     before(async () => {
         this.avatar = await SleepAvatar.new({ from: dev })
-        avatarContract = new web3.eth.Contract(SleepAvatar.abi, this.avatar.address)
     })
 
     let aliceAvatarId

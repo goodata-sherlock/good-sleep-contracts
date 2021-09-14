@@ -9,6 +9,7 @@ const ethSigUtil = require('eth-sig-util');
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 const Wallet = require('ethereumjs-wallet').default;
 
+const SleepAvatar = artifacts.require('SleepAvatar')
 const Reward = artifacts.require('RewardV1')
 const MetaTx = artifacts.require('MetaTx')
 
@@ -47,7 +48,15 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         };
         metaTxContract = new web3.eth.Contract(MetaTx.abi, this.metaTx.address)
 
-        this.reward = await Reward.new(this.metaTx.address, { from: dev })
+        this.avatar = await SleepAvatar.new({ from: dev })
+
+        this.reward = await Reward.new(
+            this.avatar.address,
+            this.metaTx.address,
+            {
+                from: dev
+            }
+        )
         this.reward.transferOwnership(backend, { from: dev })
         rewardContract = new web3.eth.Contract(Reward.abi, this.reward.address)
     })
@@ -56,30 +65,23 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     let bobAvatarId
     let carolAvatarId
     it('Users create avatar owned by themself', async () => {
-        // TODO:
-        aliceAvatarId = 1
-        bobAvatarId = 2
-        carolAvatarId = 3
-        /*
-
-        let createAvatarReceipt1 = await this.reward.createAvatar({ from: alice })
+        let createAvatarReceipt1 = await this.avatar.createAvatar({ from: alice })
         const transferEventArgs1 = testUtils.getEventArgsFromTx(createAvatarReceipt1, 'Transfer')
         aliceAvatarId = transferEventArgs1.tokenId
         assert.equal(aliceAvatarId.toString(), '1')
-        assert.equal(await this.reward.ownerOf(aliceAvatarId), alice)
+        assert.equal(await this.avatar.ownerOf(aliceAvatarId), alice)
         
-        let createAvatarReceipt2 = await this.reward.createAvatar({ from: bob })
+        let createAvatarReceipt2 = await this.avatar.createAvatar({ from: bob })
         const transferEventArgs2 = testUtils.getEventArgsFromTx(createAvatarReceipt2, 'Transfer')
         bobAvatarId = transferEventArgs2.tokenId
         assert.equal(bobAvatarId.toString(), '2')
-        assert.equal(await this.reward.ownerOf(bobAvatarId), bob)
+        assert.equal(await this.avatar.ownerOf(bobAvatarId), bob)
 
-        let createAvatarReceipt3 = await this.reward.createAvatar({ from: carol })
+        let createAvatarReceipt3 = await this.avatar.createAvatar({ from: carol })
         const transferEventArgs3 = testUtils.getEventArgsFromTx(createAvatarReceipt3, 'Transfer')
         carolAvatarId = transferEventArgs3.tokenId
         assert.equal(carolAvatarId.toString(), '3')
-        assert.equal(await this.reward.ownerOf(carolAvatarId), carol)
-        */
+        assert.equal(await this.avatar.ownerOf(carolAvatarId), carol)
     })
 
     it('Backend feeds avatars', async() => {
