@@ -2,7 +2,8 @@ import {
     Approval as ApprovalEvent,
     ApprovalForAll as ApprovalForAllEvent,
     Transfer as TransferEvent,
-    TokenURIUpdated as TokenURIUpdatedEvent
+    TokenURIUpdated as TokenURIUpdatedEvent,
+    ERC721
 } from '../generated/GoodSleepContract/ERC721'
 
 import {
@@ -39,7 +40,8 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
     entity.save()
 
     let token = Token.load(event.params.tokenId.toHex())
-    token.uri = event.params.uri
+    let tokenContract = ERC721.bind(event.address)
+    token.uri = tokenContract.tokenURI(entity.tokenId)
     token.save()
 }
 
