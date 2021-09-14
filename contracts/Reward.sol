@@ -47,11 +47,15 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
     }
 
     function setMultiplier(uint256 _multiplier) public override {
+        uint256 oldMultiplier = multiplier;
         multiplier = _multiplier;
+        emit MultiplierUpdated(oldMultiplier, _multiplier);
     }
 
     function withdraw(uint256 tokenId) public override returns(uint256) {
-        return _withdraw(tokenId);
+        uint256 amount = _withdraw(tokenId);
+        emit Withdrawal(tokenId, _msgSender(), amount);
+        return amount;
     }
 
     function _withdraw(uint256 tokenId) public virtual returns(uint256) {

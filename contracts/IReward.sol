@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 // interface IReward is IERC721, IERC721Metadata {
 interface IReward {
-    event ServiceAddrUpdated(address indexed oldAddr, address indexed newAddr);
     event Feeding(uint256 tokenId, uint256 amount);
     event MultiplierUpdated(uint256 oldMultiplier, uint256 newMultiplier);
+    event Withdrawal(uint256 indexed tokenId, address indexed to, uint256 amount);
 
     struct FeedParam {
         uint256 tokenId;
