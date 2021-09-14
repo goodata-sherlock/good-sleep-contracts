@@ -1,6 +1,7 @@
 type Token @entity {
   id: ID!
   owner: Bytes!
+  uri: String!
 }
 
 type Approval @entity {
@@ -17,18 +18,10 @@ type ApprovalForAll @entity {
   approved: Boolean! # bool
 }
 
-type TokenMetadataURIUpdated @entity {
-  id: ID!
-  _tokenId: BigInt! # uint256
-  owner: Bytes! # address
-  _uri: String! # string
-}
-
 type TokenURIUpdated @entity {
   id: ID!
-  _tokenId: BigInt! # uint256
-  owner: Bytes! # address
-  _uri: String! # string
+  tokenId: BigInt! # uint256
+  uri: String! # string
 }
 
 type Transfer @entity {

@@ -1,13 +1,15 @@
 import {
     Approval as ApprovalEvent,
     ApprovalForAll as ApprovalForAllEvent,
-    Transfer as TransferEvent
+    Transfer as TransferEvent,
+    TokenURIUpdated as TokenURIUpdatedEvent
 } from '../generated/GoodSleepContract/ERC721'
 
 import {
     Approval,
     ApprovalForAll,
-    Transfer
+    Transfer,
+    TokenURIUpdated
 } from "../generated/schema"
 
 import { Token } from '../generated/schema'
@@ -26,6 +28,19 @@ export function handleTransfer(event: TransferEvent): void {
     transfer.to = event.params.to
     transfer.tokenId = event.params.tokenId
     transfer.save()
+}
+
+export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
+    let entity = new TokenURIUpdated(
+        event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+    )
+    entity.tokenId = event.params.tokenId
+    entity.uri = event.params.uri
+    entity.save()
+
+    let token = Token.load(event.params.tokenId.toHex())
+    token.uri = event.params.uri
+    token.save()
 }
 
 export function handleApproval(event: ApprovalEvent): void {

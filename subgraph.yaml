@@ -23,4 +23,10 @@ dataSources:
     eventHandlers:
     - event: Transfer(indexed address,indexed address,indexed uint256)
       handler: handleTransfer
+    - event: TokenURIUpdated(indexed uint256,string)
+      handler: handleTokenURIUpdated
+    - event: Approval(indexed address,indexed address,indexed uint256)
+      handler: handleApproval
+    - event: ApprovalForAll(indexed address,indexed address,bool)
+      handler: handleApprovalForAll
     file: ./src/mapping.ts
