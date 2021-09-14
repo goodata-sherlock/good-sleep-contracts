@@ -30,3 +30,22 @@ type Transfer @entity {
   to: Bytes! # address
   tokenId: BigInt! # uint256
 }
+
+type FeedRecord @entity {
+  id: ID!
+  tokenId: BigInt!
+  amount: BigInt!
+}
+
+type MultiplierUpdated @entity {
+  id: ID!
+  oldMultiplier: BigInt!
+  newMultiplier: BigInt!
+}
+
+type RewardWithdrawal @entity {
+  id: ID!
+  tokenId: BigInt!
+  to: Bytes!
+  amount: BigInt!
+}

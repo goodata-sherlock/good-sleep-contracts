@@ -4,33 +4,59 @@ repository: https://github.com/good-data-foundation/good-sleep-contracts
 schema:
   file: ./schema.graphql
 dataSources:
-- kind: ethereum/contract
-  name: GoodSleepContract
-  network: mainnet
-  source:
-    address: "0xbd559D8886D6Cbd2C1086CD1c01811Ddbd5964B8"
-    abi: ERC721
-    startBlock: 5529285
-  mapping:
-    kind: ethereum/events
-    apiVersion: 0.0.4
-    language: wasm/assemblyscript
-    entities:
-    - Token
-    - Approval
-    - ApprovalForAll
-    - TokenURIUpdated
-    - Transfer
-    abis:
-    - name: ERC721
-      file: ./abis/ERC721.json
-    eventHandlers:
-    - event: Transfer(indexed address,indexed address,indexed uint256)
-      handler: handleTransfer
-    - event: TokenURIUpdated(indexed uint256,string)
-      handler: handleTokenURIUpdated
-    - event: Approval(indexed address,indexed address,indexed uint256)
-      handler: handleApproval
-    - event: ApprovalForAll(indexed address,indexed address,bool)
-      handler: handleApprovalForAll
-    file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: GoodSleepContract
+    network: mainnet
+    source:
+      address: "0xbd559D8886D6Cbd2C1086CD1c01811Ddbd5964B8"
+      abi: ERC721
+      startBlock: 5529285
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+      - Token
+      - Approval
+      - ApprovalForAll
+      - TokenURIUpdated
+      - Transfer
+      abis:
+      - name: ERC721
+        file: ./abis/ERC721.json
+      eventHandlers:
+      - event: Transfer(indexed address,indexed address,indexed uint256)
+        handler: handleTransfer
+      - event: TokenURIUpdated(indexed uint256,string)
+        handler: handleTokenURIUpdated
+      - event: Approval(indexed address,indexed address,indexed uint256)
+        handler: handleApproval
+      - event: ApprovalForAll(indexed address,indexed address,bool)
+        handler: handleApprovalForAll
+      file: ./src/mappings/ERC721.ts
+  - kind: ethereum/contract
+    name: RewardV1
+    network: mainnet
+    source:
+      address: "0xbd559D8886D6Cbd2C1086CD1c01811Ddbd5964B8"
+      abi: Reward
+      startBlock: 5529285
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+      - FeedRecord
+      - MultiplierUpdated
+      - RewardWithdrawal
+      abis:
+      - name: Reward
+        file: ./abis/Reward.json
+      eventHandlers:
+      - event: Feeding(indexed uint256,uint256)
+        handler: handleFeeding
+      - event: MultiplierUpdated(indexed uint256,indexed uint256)
+        handler: handleMultiplierUpdated
+      - event: Withdrawal(indexed uint256,indexed address,uint256)
+        handler: handleWithdrawal
+      file: ./src/mappings/Reward.ts

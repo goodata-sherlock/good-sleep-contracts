@@ -4,16 +4,16 @@ import {
     Transfer as TransferEvent,
     TokenURIUpdated as TokenURIUpdatedEvent,
     ERC721
-} from '../generated/GoodSleepContract/ERC721'
+} from '../../generated/GoodSleepContract/ERC721'
 
 import {
     Approval,
     ApprovalForAll,
     Transfer,
     TokenURIUpdated
-} from "../generated/schema"
+} from "../../generated/schema"
 
-import { Token } from '../generated/schema'
+import { Token } from '../../generated/schema'
 
 export function handleTransfer(event: TransferEvent): void {
     let tokenId = event.params.tokenId.toHex()
