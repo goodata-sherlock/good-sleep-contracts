@@ -11,22 +11,16 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./IAvatar.sol";
 
-// MUST inherit ERC2771Context for supporting meta tx.
-abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, Ownable, ERC2771Context {
+abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
     using Strings for uint256;
     using SafeMath for uint256;
 
     uint256 private _currentTokenId = 0;
-    // tokenId => the number of records
-    mapping (uint256 => uint256) public override records;
-    mapping (uint256 => uint256) public override lastRewardRecords;
-    uint256 public override multiplier = 10**18;
 
     constructor(
         string memory name,
-        string memory symbol,
-        address trustedForwarder
-    ) ERC721(name, symbol) ERC2771Context(trustedForwarder) {}
+        string memory symbol
+    ) ERC721(name, symbol) {}
 
     function createAvatar() public virtual override {
         createAvatar("");
@@ -37,41 +31,6 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, O
         _safeMint(_msgSender(), tokenId, _data);
         _incrementTokenId();
         setTokenURI(tokenId, _appendStr(_baseURI(), tokenId.toString()));
-    }
-
-    function feed(uint256 tokenId, uint256 amount) public virtual onlyOwner override {
-        require(_exists(tokenId), "Avatar: Feed nonexistent avatar");
-        records[tokenId] += amount;
-        emit Feeding(tokenId, amount);
-    }
-
-    function batchFeed(FeedParam[] memory params) public virtual onlyOwner override {
-        for (uint256 i = 0; i < params.length; i++) {
-            FeedParam memory param = params[i];
-            feed(param.tokenId, param.amount);
-        }
-    }
-
-    function reward(uint256 tokenId) public view override returns(uint256) {
-        return _reward(tokenId);
-    }
-
-    function _reward(uint256 tokenId) public virtual view returns(uint256) {
-        uint256 record = records[tokenId];
-        return record.sub(lastRewardRecords[tokenId]);
-    }
-
-    function setMultiplier(uint256 _multiplier) public override {
-        multiplier = _multiplier;
-    }
-
-    function withdraw(uint256 tokenId) public override returns(uint256) {
-        return _withdraw(tokenId);
-    }
-
-    function _withdraw(uint256 tokenId) public virtual returns(uint256) {
-        lastRewardRecords[tokenId] = records[tokenId];
-        return 0;
     }
 
     function _baseURI() internal view virtual override(ERC721) returns (string memory) {
@@ -152,13 +111,5 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar, O
      */
     function _appendStr(string memory a, string memory b) internal virtual pure returns(string memory) {
         return string(abi.encodePacked(a, b));
-    }
-
-    function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {
-        return ERC2771Context._msgSender();
-    }
-
-    function _msgData() internal view virtual override(Context, ERC2771Context) returns (bytes calldata) {
-        return ERC2771Context._msgData();
     }
 }
