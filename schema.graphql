@@ -1,4 +1,4 @@
-type Avatar @entity {
+type Token @entity {
   id: ID!
-  currentOwner: Address!
+  currentOwner: Bytes!
 }

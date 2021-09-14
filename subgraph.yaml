@@ -1,25 +1,25 @@
-specVersion: 0.0.1
-description: Avatar Example
+specVersion: 0.0.2
+description: ERC721 Example
 repository: https://github.com/good-data-foundation/good-sleep-contracts
 schema:
   file: ./schema.graphql
 dataSources:
 - kind: ethereum/contract
-  name: GoodAvatarContract
+  name: GoodSleepContract
   network: mainnet
   source:
     address: "0x06012c8cf97BEaD5deAe237070F9587f8E7A266d"
-    abi: Avatar
+    abi: ERC721
   mapping:
     kind: ethereum/events
     apiVersion: 0.0.1
     language: wasm/assemblyscript
     entities:
-    - Avatar
+    - Token
     abis:
-    - name: Avatar
-      file: ./abis/Avatar.json
+    - name: ERC721
+      file: ./abis/ERC721.json
     eventHandlers:
-    - event: Transfer(address,address,uint256)
+    - event: Transfer(indexed address,indexed address,indexed uint256)
       handler: handleTransfer
-    file: ./mapping.ts
+    file: ./src/mapping.ts
