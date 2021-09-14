@@ -1,7 +1,7 @@
 type Token @entity {
   id: ID!
   owner: Bytes!
-  uri: String
+  uri: String # string
 }
 
 type Approval @entity {
@@ -33,19 +33,19 @@ type Transfer @entity {
 
 type FeedRecord @entity {
   id: ID!
-  tokenId: BigInt!
-  amount: BigInt!
+  tokenId: BigInt! # uint256
+  amount: BigInt! # uint256
 }
 
 type MultiplierUpdated @entity {
   id: ID!
-  oldMultiplier: BigInt!
-  newMultiplier: BigInt!
+  oldMultiplier: BigInt! # uint256
+  newMultiplier: BigInt! # uint256
 }
 
 type RewardWithdrawal @entity {
   id: ID!
-  tokenId: BigInt!
-  to: Bytes!
-  amount: BigInt!
+  tokenId: BigInt! # uint256
+  to: Bytes! # address
+  amount: BigInt! # uint256
 }
