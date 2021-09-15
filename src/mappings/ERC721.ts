@@ -35,13 +35,14 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
     let entity = new TokenURIUpdated(
         event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     )
+    let tokenContract = ERC721.bind(event.address)
+    let uri = tokenContract.tokenURI(event.params.tokenId)
     entity.token = event.params.tokenId.toHex()
-    entity.uri = event.params.uri
+    entity.uri = uri
     entity.save()
 
     let token = Token.load(event.params.tokenId.toHex())
-    let tokenContract = ERC721.bind(event.address)
-    token.uri = tokenContract.tokenURI(event.params.tokenId)
+    token.uri = uri
     token.save()
 }
 
