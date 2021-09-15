@@ -14,4 +14,5 @@ interface IAvatar {
     function burn(uint256 tokenId) external;
 
     function createAvatar() external;
+    function getCurrTokenId() external view returns (uint256);
 }

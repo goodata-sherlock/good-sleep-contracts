@@ -23,6 +23,7 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         _beforeFeed(tokenId, amount);
         records[tokenId] += amount;
         emit Feeding(tokenId, amount);
+        _afterFeed(tokenId, amount);
     }
 
     /**
@@ -30,11 +31,24 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
     */
     function _beforeFeed(uint256 tokenId, uint256 amount) internal virtual {}
 
+    /**
+    * @dev Hook that is called after any feed.
+    */
+    function _afterFeed(uint256 tokenId, uint256 amount) internal virtual {}
+
     function batchFeed(FeedParam[] memory params) public virtual onlyOwner override {
         for (uint256 i = 0; i < params.length; i++) {
             FeedParam memory param = params[i];
             feed(param.tokenId, param.amount);
         }
+    }
+
+    function phase() public override view returns(uint256) {
+        return _phase();
+    }
+
+    function _phase() public virtual view returns(uint256) {
+        return 0;
     }
 
     function reward(uint256 tokenId) public view override returns(uint256) {

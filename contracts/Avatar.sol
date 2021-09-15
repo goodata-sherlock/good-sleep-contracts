@@ -92,6 +92,10 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
         super._burn(tokenId);
     }
 
+    function getCurrTokenId() public virtual override view returns (uint256) {
+        return _currentTokenId;
+    }
+
     /**
      * @dev calculates the next token ID based on value of _currentTokenId
      * @return uint256 for the next token ID

@@ -15,6 +15,7 @@ interface IReward {
     function feed(uint256 tokenId, uint256 amount) external;
     function batchFeed(FeedParam[] memory params) external;
     
+    function phase() external view returns(uint256);
     function records(uint256 tokenId) external view returns(uint256);
     function lastRewardRecords(uint256 tokenId) external view returns(uint256);
     function reward(uint256 tokenId) external view returns(uint256);
