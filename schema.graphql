@@ -1,0 +1,51 @@
+type Token @entity {
+  id: ID!
+  owner: Bytes!
+  uri: String # string
+}
+
+type Approval @entity {
+  id: ID!
+  owner: Bytes! # address
+  approved: Bytes! # address
+  tokenId: BigInt! # uint256
+}
+
+type ApprovalForAll @entity {
+  id: ID!
+  owner: Bytes! # address
+  operator: Bytes! # address
+  approved: Boolean! # bool
+}
+
+type TokenURIUpdated @entity {
+  id: ID!
+  tokenId: BigInt! # uint256
+  uri: String! # string
+}
+
+type Transfer @entity {
+  id: ID!
+  from: Bytes! # address
+  to: Bytes! # address
+  tokenId: BigInt! # uint256
+}
+
+type FeedRecord @entity {
+  id: ID!
+  tokenId: BigInt! # uint256
+  amount: BigInt! # uint256
+}
+
+type MultiplierUpdated @entity {
+  id: ID!
+  oldMultiplier: BigInt! # uint256
+  newMultiplier: BigInt! # uint256
+}
+
+type RewardWithdrawal @entity {
+  id: ID!
+  tokenId: BigInt! # uint256
+  to: Bytes! # address
+  amount: BigInt! # uint256
+}

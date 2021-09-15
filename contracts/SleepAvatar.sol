@@ -7,6 +7,6 @@ contract SleepAvatar is Avatar {
     constructor() Avatar("Good Sleep Avatar Collection", "GSA") {}
 
     function _baseURI() internal view virtual override(Avatar) returns (string memory) {
-        return "www.goodata.io/metadata/sleepdata/";
+        return "https://goodata.io/metadata/sleepdata/";
     }
 }

@@ -30,7 +30,7 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
         uint256 tokenId = _getNextTokenId();
         _safeMint(_msgSender(), tokenId, _data);
         _incrementTokenId();
-        setTokenURI(tokenId, _appendStr(_baseURI(), tokenId.toString()));
+        setTokenURI(tokenId, tokenId.toString());
     }
 
     function _baseURI() internal view virtual override(ERC721) returns (string memory) {
@@ -46,7 +46,8 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
 
     function setTokenURI(uint256 tokenId, string memory uri) public virtual override {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "Avatar: no power");
-        return _setTokenURI(tokenId, uri);
+        _setTokenURI(tokenId, uri);
+        emit TokenURIUpdated(tokenId, uri);
     }
     
     /**
@@ -104,12 +105,5 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
      */
     function _incrementTokenId() internal virtual {
         _currentTokenId++;
-    }
-
-    /**
-     * @dev appends b to a
-     */
-    function _appendStr(string memory a, string memory b) internal virtual pure returns(string memory) {
-        return string(abi.encodePacked(a, b));
     }
 }
