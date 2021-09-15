@@ -2,13 +2,16 @@ type Token @entity {
   id: ID!
   owner: Bytes!
   uri: String # string
+  approvals: [Approval!]! @derivedFrom(field: "token")
+  uriUpdates: [TokenURIUpdated!]! @derivedFrom(field: "token")
+  transfers: [Transfer!]! @derivedFrom(field: "token")
 }
 
 type Approval @entity {
   id: ID!
   owner: Bytes! # address
   approved: Bytes! # address
-  tokenId: BigInt! # uint256
+  token: Token!
 }
 
 type ApprovalForAll @entity {
@@ -20,15 +23,15 @@ type ApprovalForAll @entity {
 
 type TokenURIUpdated @entity {
   id: ID!
-  tokenId: BigInt! # uint256
   uri: String! # string
+  token: Token!
 }
 
 type Transfer @entity {
   id: ID!
   from: Bytes! # address
   to: Bytes! # address
-  tokenId: BigInt! # uint256
+  token: Token!
 }
 
 type FeedRecord @entity {
@@ -48,4 +51,5 @@ type RewardWithdrawal @entity {
   tokenId: BigInt! # uint256
   to: Bytes! # address
   amount: BigInt! # uint256
+  time: BigInt! # uint256
 }

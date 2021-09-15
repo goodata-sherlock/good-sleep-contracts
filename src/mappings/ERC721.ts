@@ -27,7 +27,7 @@ export function handleTransfer(event: TransferEvent): void {
     )
     transfer.from = event.params.from
     transfer.to = event.params.to
-    transfer.tokenId = event.params.tokenId
+    transfer.token = event.params.tokenId.toHex()
     transfer.save()
 }
 
@@ -35,13 +35,13 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
     let entity = new TokenURIUpdated(
         event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     )
-    entity.tokenId = event.params.tokenId
+    entity.token = event.params.tokenId.toHex()
     entity.uri = event.params.uri
     entity.save()
 
     let token = Token.load(event.params.tokenId.toHex())
     let tokenContract = ERC721.bind(event.address)
-    token.uri = tokenContract.tokenURI(entity.tokenId)
+    token.uri = tokenContract.tokenURI(event.params.tokenId)
     token.save()
 }
 
@@ -51,7 +51,7 @@ export function handleApproval(event: ApprovalEvent): void {
     )
     entity.owner = event.params.owner
     entity.approved = event.params.approved
-    entity.tokenId = event.params.tokenId
+    entity.token = event.params.tokenId.toHex()
     entity.save()
 }
   

@@ -38,5 +38,6 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     entity.tokenId = event.params.tokenId
     entity.to = event.params.to
     entity.amount = event.params.amount
+    entity.time = event.block.timestamp
     entity.save()
 }
