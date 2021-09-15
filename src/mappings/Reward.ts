@@ -5,6 +5,7 @@ import {
 } from '../../generated/RewardV1/Reward'
 
 import {
+    RewardRecord,
     FeedRecord,
     MultiplierUpdated,
     RewardWithdrawal
@@ -17,7 +18,15 @@ export function handleFeeding(event: FeedingEvent): void {
 
     feedRecord.tokenId = event.params.tokenId
     feedRecord.amount = event.params.amount
+    feedRecord.rewardRecord = event.params.tokenId.toHex()
     feedRecord.save()
+
+    if (RewardRecord.load(feedRecord.rewardRecord) == null) {
+        let rewardRecord = new RewardRecord(
+            event.params.tokenId.toHex()
+        )
+        rewardRecord.save()
+    }
 }
 
 export function handleMultiplierUpdated(event: MultiplierUpdatedEvent): void {
@@ -39,5 +48,13 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     entity.to = event.params.to
     entity.amount = event.params.amount
     entity.time = event.block.timestamp
+    entity.rewardRecord = event.params.tokenId.toHex()
     entity.save()
+
+    let rewardRecord = new RewardRecord(
+        event.params.tokenId.toHex()
+    )
+
+    rewardRecord.totalWithdrawal = rewardRecord.totalWithdrawal.plus(event.params.amount)
+    rewardRecord.save()
 }
