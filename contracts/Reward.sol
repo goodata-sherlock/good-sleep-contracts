@@ -21,7 +21,9 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
 
     function feed(uint256 tokenId, uint256 amount) public virtual onlyOwner override {
         _beforeFeed(tokenId, amount);
-        records[tokenId] += amount;
+        
+        uint256 _record = records[tokenId];
+        records[tokenId] = _record.add(amount);
         emit Feeding(tokenId, amount);
         _afterFeed(tokenId, amount);
     }

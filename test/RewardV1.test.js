@@ -12,6 +12,7 @@ const Wallet = require('ethereumjs-wallet').default;
 const SleepAvatar = artifacts.require('SleepAvatar')
 const Reward = artifacts.require('RewardV1')
 const MetaTx = artifacts.require('MetaTx')
+const MockGooD = artifacts.require('MockGooD')
 
 const { toWei, fromWei } = web3.utils
 
@@ -49,9 +50,11 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         metaTxContract = new web3.eth.Contract(MetaTx.abi, this.metaTx.address)
 
         this.avatar = await SleepAvatar.new({ from: dev })
+        this.good = await MockGooD.new({ from: dev })
 
         this.reward = await Reward.new(
             this.avatar.address,
+            this.good.address,
             this.metaTx.address,
             {
                 from: dev
@@ -142,7 +145,9 @@ const mustExecuteMetaTx = async (wallet, delegatorAddr,metaTxContract, method, t
     )
 
     let returnData = await metaTxContract.methods.mustExecute(req, signature).call({ from: delegatorAddr })
-    let receipt = await metaTxContract.methods.mustExecute(req, signature).send({ from: delegatorAddr })
+    // NOTE: MUST estimateGas
+    let fnGas = await metaTxContract.methods.mustExecute(req, signature).estimateGas({ from: delegatorAddr })
+    let receipt = await metaTxContract.methods.mustExecute(req, signature).send({ from: delegatorAddr, gas: fnGas })
 
     return [returnData, receipt]
 }
