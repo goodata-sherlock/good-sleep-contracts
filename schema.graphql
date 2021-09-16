@@ -2,6 +2,7 @@ type Token @entity {
   id: ID!
   owner: Bytes!
   uri: String # string
+  isBurn: Boolean!
   approvals: [Approval!]! @derivedFrom(field: "token")
   uriUpdates: [TokenURIUpdated!]! @derivedFrom(field: "token")
   transfers: [Transfer!]! @derivedFrom(field: "token")
