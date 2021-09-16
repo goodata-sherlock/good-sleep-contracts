@@ -8,6 +8,7 @@ const {
 const ethSigUtil = require('eth-sig-util');
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 const Wallet = require('ethereumjs-wallet').default;
+const { toBuffer } = require("ethereumjs-util");
 
 const SleepAvatar = artifacts.require('SleepAvatar')
 const Reward = artifacts.require('RewardV1')
@@ -16,14 +17,25 @@ const MockGooD = artifacts.require('MockGooD')
 
 const { toWei, fromWei } = web3.utils
 
-const name = 'MinimalForwarder';
-const version = '0.0.1';
+const MetaTxName = 'MinimalForwarder';
+const MetaTxVersion = '0.0.1';
 const EIP712Domain = [
     { name: 'name', type: 'string' },
     { name: 'version', type: 'string' },
     { name: 'chainId', type: 'uint256' },
     { name: 'verifyingContract', type: 'address' },
 ];
+const MetaTxTypes = {
+    EIP712Domain,
+    ForwardRequest: [
+      { name: 'from', type: 'address' },
+      { name: 'to', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'gas', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'data', type: 'bytes' },
+    ],
+}
 
 contract('Reward', ([alice, bob, carol, dev, backend]) => {
     let rewardContract
@@ -31,21 +43,10 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     before(async () => {
         this.metaTx = await MetaTx.new({ from: dev })
         this.domain = {
-            name,
-            version,
+            name: MetaTxName,
+            version: MetaTxVersion,
             chainId: await web3.eth.getChainId(),
             verifyingContract: this.metaTx.address,
-          };
-        this.types = {
-            EIP712Domain,
-            ForwardRequest: [
-              { name: 'from', type: 'address' },
-              { name: 'to', type: 'address' },
-              { name: 'value', type: 'uint256' },
-              { name: 'gas', type: 'uint256' },
-              { name: 'nonce', type: 'uint256' },
-              { name: 'data', type: 'bytes' },
-            ],
         };
         metaTxContract = new web3.eth.Contract(MetaTx.abi, this.metaTx.address)
 
@@ -110,14 +111,37 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         assert.equal((await this.reward.records(bobAvatarId)).toString(), '0')
 
         let feedMethod = rewardContract.methods.feed(bobAvatarId, toWei('1'))
-        let [returndata, receipt] = await mustExecuteMetaTx(wallet, bob, metaTxContract, feedMethod, this.reward.address, '0', this.types, this.domain)
+        let [returndata, receipt] = await mustExecuteMetaTx(wallet, bob, metaTxContract, feedMethod, this.reward.address, '0', this.domain)
         console.log('returndata: ', returndata)
         console.log('receipt: ', receipt)
         assert.equal((await this.reward.records(bobAvatarId)).toString(), toWei('1'))
     })
+
+    it('test sign typed data', async() => {
+        // TODO: delete
+        domain = this.domain
+        domain.chainId = 32
+        let typedData = getTypedMessage(
+            {
+                from: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
+                to: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
+                value: '0',
+                gas: '100000000',
+                nonce: Number(1),
+                data: '0xdddddd',
+            },
+            domain,
+        )
+        console.log('--------- typedData: ', JSON.stringify(typedData))
+        let sig = signTypedData(
+            Wallet.fromPrivateKey(toBuffer('0x9a01f5c57e377e0239e6036b7b2d700454b760b2dab51390f1eeb2f64fe98b68')),
+            typedData,
+        )
+        console.log('--------- expectSig: ', sig)
+    })
 })
 
-const mustExecuteMetaTx = async (wallet, delegatorAddr,metaTxContract, method, to, value, types, domain) => {
+const mustExecuteMetaTx = async (wallet, delegatorAddr,metaTxContract, method, to, value, domain) => {
     let fromAddr = web3.utils.toChecksumAddress(wallet.getAddressString())
     let gas = await method.estimateGas({ from: fromAddr })
     let data = method.encodeABI()
@@ -132,17 +156,8 @@ const mustExecuteMetaTx = async (wallet, delegatorAddr,metaTxContract, method, t
         data: data,
     }
 
-    let signature = ethSigUtil.signTypedMessage(
-        wallet.getPrivateKey(),
-        {
-            data: {
-              types: types,
-              domain: domain,
-              primaryType: 'ForwardRequest',
-              message: req,
-            },
-        },
-    )
+    let typedData = getTypedMessage(req, domain)
+    let signature = signTypedData(wallet, typedData)
 
     let returnData = await metaTxContract.methods.mustExecute(req, signature).call({ from: delegatorAddr })
     // NOTE: MUST estimateGas
@@ -150,4 +165,22 @@ const mustExecuteMetaTx = async (wallet, delegatorAddr,metaTxContract, method, t
     let receipt = await metaTxContract.methods.mustExecute(req, signature).send({ from: delegatorAddr, gas: fnGas })
 
     return [returnData, receipt]
+}
+
+const getTypedMessage = (req, domain) => {
+    return {
+        types: MetaTxTypes,
+        domain: domain,
+        primaryType: 'ForwardRequest',
+        message: req,
+    }
+}
+
+const signTypedData = (wallet, typedData) => {
+    return ethSigUtil.signTypedMessage(
+        wallet.getPrivateKey(),
+        {
+            data: typedData,
+        },
+    )
 }
