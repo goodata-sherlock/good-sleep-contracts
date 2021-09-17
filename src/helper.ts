@@ -2,17 +2,17 @@ import {
     Address
 } from '@graphprotocol/graph-ts'
 
-const DataNFT = ''
-const AvatarNFT = ''
+const SleepAvatarNFT = '0x2338B7e8189bE74896cD892411A6AFfcDEfC7fa9'
+const AppearanceAvatarNFT = '0xbCCab9aDf117C22fee8c0805890bB23f2407316D'
 
 let NFTWhiteList = [
-    DataNFT,
-    AvatarNFT,
+    SleepAvatarNFT,
+    AppearanceAvatarNFT,
 ]
 
 const isInNFTWhiteList = (addr: Address) :boolean => {
     NFTWhiteList.forEach((value) => {
-        if (value == addr.toHex()) {
+        if (value.toLowerCase() == addr.toHex().toLowerCase()) {
             return true
         }
     })
@@ -20,4 +20,4 @@ const isInNFTWhiteList = (addr: Address) :boolean => {
     return false
 }
 
-export { DataNFT, AvatarNFT, NFTWhiteList, isInNFTWhiteList }
+export { SleepAvatarNFT, AppearanceAvatarNFT, NFTWhiteList, isInNFTWhiteList }
