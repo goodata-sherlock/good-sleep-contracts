@@ -4,3 +4,4 @@ node_modules
 artifacts
 generated
 *.log
+file/

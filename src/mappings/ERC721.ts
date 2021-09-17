@@ -7,6 +7,10 @@ import {
 } from '@openzeppelin/test-helpers/src/constants'
 
 import {
+    isInNFTWhiteList
+} from '../helper'
+
+import {
     Approval as ApprovalEvent,
     ApprovalForAll as ApprovalForAllEvent,
     Transfer as TransferEvent,
@@ -19,10 +23,14 @@ import {
     ApprovalForAll,
     Transfer,
     Token,
+    TokenCollection,
     TokenURIUpdated
 } from "../../generated/schema"
 
 export function handleTransfer(event: TransferEvent): void {
+    if (!isInNFTWhiteList(event.address)) {
+        return
+    }
     let tokenId = event.params.tokenId.toHex()
     let token: Token
     if (event.params.to.equals(Address.fromHexString(ZERO_ADDRESS))) {
@@ -33,9 +41,21 @@ export function handleTransfer(event: TransferEvent): void {
         // mint
         token = new Token(tokenId)
         token.isBurn = false
+
+        // update collection
+        if (TokenCollection.load(event.address.toHex()) == null) {
+            let collection = new TokenCollection(
+                event.address.toHex()
+            )
+            let tokenContract = ERC721.bind(event.address)
+            collection.name = tokenContract.name()
+            collection.symbol = tokenContract.symbol()
+            collection.save()
+        }
     }
 
     token.owner = event.params.to
+    token.collection = event.address.toHex()
     token.save()
 
     let transfer = new Transfer(
@@ -48,6 +68,9 @@ export function handleTransfer(event: TransferEvent): void {
 }
 
 export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
+    if (!isInNFTWhiteList(event.address)) {
+        return
+    }
     let entity = new TokenURIUpdated(
         event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     )
@@ -63,6 +86,9 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
 }
 
 export function handleApproval(event: ApprovalEvent): void {
+    if (!isInNFTWhiteList(event.address)) {
+        return
+    }
     let entity = new Approval(
       event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     )
@@ -73,6 +99,9 @@ export function handleApproval(event: ApprovalEvent): void {
 }
   
 export function handleApprovalForAll(event: ApprovalForAllEvent): void {
+    if (!isInNFTWhiteList(event.address)) {
+        return
+    }
     let entity = new ApprovalForAll(
       event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     )

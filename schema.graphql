@@ -1,5 +1,13 @@
+type TokenCollection @entity {
+  id: ID! # address of ERC721
+  name: String!
+  symbol: String!
+  tokens: [Token!]! @derivedFrom(field: "collection")
+}
+
 type Token @entity {
   id: ID!
+  collection: TokenCollection!
   owner: Bytes!
   uri: String # string
   isBurn: Boolean!

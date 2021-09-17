@@ -3,11 +3,11 @@ pragma solidity ^0.8.0;
 
 import "./Avatar.sol";
 
-contract SleepAvatar is Avatar {
+contract AppearanceAvatar is Avatar {
     constructor(address trustedForwarder)
-        Avatar("Good Sleep Avatar Collection", "GSA", trustedForwarder) {}
+        Avatar("Good Appearance Avatar Collection", "GAA", trustedForwarder) {}
 
     function _baseURI() internal view virtual override(Avatar) returns (string memory) {
-        return "https://goodata.io/metadata/sleepdata/";
+        return "https://goodata.io/metadata/appearance/";
     }
 }
