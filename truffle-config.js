@@ -48,7 +48,7 @@ module.exports = {
     gdtestnet: {
       provider: () => new HDWalletProvider(mnemonic, `https://test2.goodata.io`),
       network_id: 32,       // good data testnet chain id
-      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      confirmations: 0,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       gasPrice: 1000000000, // 1 gwei (in wei) (default: 100 gwei)
     },
