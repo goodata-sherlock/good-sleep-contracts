@@ -3,10 +3,6 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import {
-    ZERO_ADDRESS
-} from '@openzeppelin/test-helpers/src/constants'
-
-import {
     isInNFTWhiteList
 } from '../helper'
 
@@ -27,6 +23,8 @@ import {
     TokenURIUpdated
 } from "../../generated/schema"
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+
 export function handleTransfer(event: TransferEvent): void {
     if (!isInNFTWhiteList(event.address)) {
         return
@@ -35,7 +33,7 @@ export function handleTransfer(event: TransferEvent): void {
     let token: Token
     if (event.params.to.equals(Address.fromHexString(ZERO_ADDRESS))) {
         // burn
-        token = Token.load(tokenId)
+        token = Token.load(tokenId) as Token
         token.isBurn = true
     } else if (event.params.from.equals(Address.fromHexString(ZERO_ADDRESS))) {
         // mint
