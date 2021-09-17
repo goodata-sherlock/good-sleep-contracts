@@ -56,10 +56,9 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     entity.rewardRecord = event.params.tokenId.toHex()
     entity.save()
 
-    let rewardRecord = new RewardRecord(
-        event.params.tokenId.toHex()
-    )
+    let rewardRecord = RewardRecord.load(event.params.tokenId.toHex()) as RewardRecord
 
     rewardRecord.totalWithdrawal = rewardRecord.totalWithdrawal.plus(event.params.amount)
+
     rewardRecord.save()
 }

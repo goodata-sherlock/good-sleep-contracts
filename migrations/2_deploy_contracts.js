@@ -48,12 +48,18 @@ const deployContractsInTestnet = async (deployer) => {
     let rewardV1 = await RewardV1.deployed()
     deployedContracts.rewardV1 = rewardV1.address
 
+    // Lock enough token to Reward contract
+    await good.transfer(rewardV1.address, toWei('100000000'))
+
+    // Add some test datas
     for (let i = 1; i < 5; i++) {
         await sleepAvatar.createAvatar()
-        rewardV1.feed(''+i, toWei(''+i))
+        rewardV1.feed(''+i, ''+i)
     }
-    
+
     for (let i = 1; i< 4; i++) {
         await appearanceAvatar.createAvatar()
     }
+
+    await rewardV1.withdraw('2')
 }
