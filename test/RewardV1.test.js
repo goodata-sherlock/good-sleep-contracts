@@ -8,7 +8,10 @@ const {
 const ethSigUtil = require('eth-sig-util');
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 const Wallet = require('ethereumjs-wallet').default;
-const { toBuffer } = require("ethereumjs-util");
+const {
+    toBuffer,
+    keccak256,
+} = require("ethereumjs-util");
 
 const SleepAvatar = artifacts.require('SleepAvatar')
 const Reward = artifacts.require('RewardV1')
@@ -120,24 +123,30 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     it('test sign typed data', async() => {
         // TODO: delete
         domain = this.domain
-        domain.chainId = 32
+        req = {
+            from: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
+            to: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
+            value: '0',
+            gas: '100000000',
+            nonce: Number(1),
+            data: '0xdddddd',
+        }
         let typedData = getTypedMessage(
-            {
-                from: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
-                to: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
-                value: '0',
-                gas: '100000000',
-                nonce: Number(1),
-                data: '0xdddddd',
-            },
+            req,
             domain,
         )
+
+        let typedHash = await this.metaTx.digest(req)
         console.log('--------- typedData: ', JSON.stringify(typedData))
+        console.log('--------- typedHash: ', typedHash)
+
+        let wallet = Wallet.fromPrivateKey(toBuffer('0x9a01f5c57e377e0239e6036b7b2d700454b760b2dab51390f1eeb2f64fe98b68'))
         let sig = signTypedData(
-            Wallet.fromPrivateKey(toBuffer('0x9a01f5c57e377e0239e6036b7b2d700454b760b2dab51390f1eeb2f64fe98b68')),
+            wallet,
             typedData,
         )
         console.log('--------- expectSig: ', sig)
+        console.log('--------- sig      : ', ethSigUtil.personalSign(wallet.getPrivateKey(), typedHash))
     })
 })
 
