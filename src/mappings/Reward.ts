@@ -29,7 +29,7 @@ export function handleFeeding(event: FeedingEvent): void {
         let rewardRecord = new RewardRecord(
             event.params.tokenId.toHex()
         )
-        rewardRecord.totalWithdrawal = new BigInt()
+        rewardRecord.totalWithdrawal = BigInt.fromI32(0)
         rewardRecord.save()
     }
 }
