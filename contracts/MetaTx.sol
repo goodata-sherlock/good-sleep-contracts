@@ -55,7 +55,7 @@ contract MetaTx is EIP712 {
         );
         // Validate that the relayer has sent enough gas for the call.
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
-        require(gasleft() > req.gas / 63, "MinimalForwarder: the relayer doesnt have sent enough gas for the call");
+        assert(gasleft() > req.gas / 63);
 
         return (success, returndata);
     }
@@ -76,7 +76,7 @@ contract MetaTx is EIP712 {
         );
         // Validate that the relayer has sent enough gas for the call.
         // See https://ronan.eth.link/blog/ethereum-gas-dangers/
-        require(gasleft() > req.gas / 63, "MinimalForwarder: the relayer doesnt have sent enough gas for the call");
+        assert(gasleft() > req.gas / 63);
         require(success, "MinimalForwarder: function call not successful");
         return returndata;
     }

@@ -1,4 +1,12 @@
 import {
+    Address
+} from '@graphprotocol/graph-ts'
+
+import {
+    ZERO_ADDRESS
+} from '@openzeppelin/test-helpers/src/constants'
+
+import {
     Approval as ApprovalEvent,
     ApprovalForAll as ApprovalForAllEvent,
     Transfer as TransferEvent,
@@ -10,16 +18,24 @@ import {
     Approval,
     ApprovalForAll,
     Transfer,
+    Token,
     TokenURIUpdated
 } from "../../generated/schema"
 
-import { Token } from '../../generated/schema'
-
 export function handleTransfer(event: TransferEvent): void {
     let tokenId = event.params.tokenId.toHex()
-    let token = new Token(tokenId)
-    token.owner = event.params.to
+    let token: Token
+    if (event.params.to.equals(Address.fromHexString(ZERO_ADDRESS))) {
+        // burn
+        token = Token.load(tokenId)
+        token.isBurn = true
+    } else if (event.params.from.equals(Address.fromHexString(ZERO_ADDRESS))) {
+        // mint
+        token = new Token(tokenId)
+        token.isBurn = false
+    }
 
+    token.owner = event.params.to
     token.save()
 
     let transfer = new Transfer(
@@ -27,7 +43,7 @@ export function handleTransfer(event: TransferEvent): void {
     )
     transfer.from = event.params.from
     transfer.to = event.params.to
-    transfer.tokenId = event.params.tokenId
+    transfer.token = event.params.tokenId.toHex()
     transfer.save()
 }
 
@@ -35,13 +51,14 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
     let entity = new TokenURIUpdated(
         event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     )
-    entity.tokenId = event.params.tokenId
-    entity.uri = event.params.uri
+    let tokenContract = ERC721.bind(event.address)
+    let uri = tokenContract.tokenURI(event.params.tokenId)
+    entity.token = event.params.tokenId.toHex()
+    entity.uri = uri
     entity.save()
 
     let token = Token.load(event.params.tokenId.toHex())
-    let tokenContract = ERC721.bind(event.address)
-    token.uri = tokenContract.tokenURI(entity.tokenId)
+    token.uri = uri
     token.save()
 }
 
@@ -51,7 +68,7 @@ export function handleApproval(event: ApprovalEvent): void {
     )
     entity.owner = event.params.owner
     entity.approved = event.params.approved
-    entity.tokenId = event.params.tokenId
+    entity.token = event.params.tokenId.toHex()
     entity.save()
 }
   
