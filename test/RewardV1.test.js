@@ -53,7 +53,7 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         };
         metaTxContract = new web3.eth.Contract(MetaTx.abi, this.metaTx.address)
 
-        this.avatar = await SleepAvatar.new({ from: dev })
+        this.avatar = await SleepAvatar.new(this.metaTx.address, { from: dev })
         this.good = await MockGooD.new({ from: dev })
 
         this.reward = await Reward.new(

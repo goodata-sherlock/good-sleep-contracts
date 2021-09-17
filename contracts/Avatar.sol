@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./IAvatar.sol";
 
-abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
+abstract contract Avatar is ERC2771Context, ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
     using Strings for uint256;
     using SafeMath for uint256;
 
@@ -19,16 +19,21 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
 
     constructor(
         string memory name,
-        string memory symbol
-    ) ERC721(name, symbol) {}
+        string memory symbol,
+        address trustedForwarder
+    ) ERC721(name, symbol) ERC2771Context(trustedForwarder) {}
 
     function createAvatar() public virtual override {
-        createAvatar("");
+        createAvatarTo(_msgSender());
     }
 
-    function createAvatar(bytes memory _data) internal virtual {
+    function createAvatarTo(address to) public virtual {
+        return createAvatar(to, "");
+    }
+
+    function createAvatar(address to, bytes memory _data) internal virtual {
         uint256 tokenId = _getNextTokenId();
-        _safeMint(_msgSender(), tokenId, _data);
+        _safeMint(to, tokenId, _data);
         _incrementTokenId();
         setTokenURI(tokenId, tokenId.toString());
     }
@@ -109,5 +114,13 @@ abstract contract Avatar is ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
      */
     function _incrementTokenId() internal virtual {
         _currentTokenId++;
+    }
+
+    function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {
+        return ERC2771Context._msgSender();
+    }
+
+    function _msgData() internal view virtual override(Context, ERC2771Context) returns (bytes calldata) {
+        return ERC2771Context._msgData();
     }
 }

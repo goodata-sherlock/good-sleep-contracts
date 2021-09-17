@@ -8,7 +8,7 @@ dataSources:
     name: GoodSleepContract
     network: mainnet
     source:
-      address: "0xbd559D8886D6Cbd2C1086CD1c01811Ddbd5964B8"
+      # address: ""
       abi: ERC721
       startBlock: 5529285
     mapping:

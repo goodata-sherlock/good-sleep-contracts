@@ -9,12 +9,14 @@ const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 const Wallet = require('ethereumjs-wallet').default;
 
 const SleepAvatar = artifacts.require('SleepAvatar')
+const MetaTx = artifacts.require('MetaTx')
 
 const { toWei, fromWei } = web3.utils
 
 contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
     before(async () => {
-        this.avatar = await SleepAvatar.new({ from: dev })
+        this.metaTx = await MetaTx.new({ from: dev })
+        this.avatar = await SleepAvatar.new(this.metaTx.address, { from: dev })
     })
 
     let aliceAvatarId

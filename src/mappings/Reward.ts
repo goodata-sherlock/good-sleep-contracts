@@ -1,4 +1,8 @@
 import {
+    BigInt
+} from '@graphprotocol/graph-ts'
+
+import {
     Feeding as FeedingEvent,
     MultiplierUpdated as MultiplierUpdatedEvent,
     Withdrawal as WithdrawalEvent
@@ -25,6 +29,7 @@ export function handleFeeding(event: FeedingEvent): void {
         let rewardRecord = new RewardRecord(
             event.params.tokenId.toHex()
         )
+        rewardRecord.totalWithdrawal = BigInt.fromI32(0)
         rewardRecord.save()
     }
 }
@@ -51,10 +56,9 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     entity.rewardRecord = event.params.tokenId.toHex()
     entity.save()
 
-    let rewardRecord = new RewardRecord(
-        event.params.tokenId.toHex()
-    )
+    let rewardRecord = RewardRecord.load(event.params.tokenId.toHex()) as RewardRecord
 
     rewardRecord.totalWithdrawal = rewardRecord.totalWithdrawal.plus(event.params.amount)
+
     rewardRecord.save()
 }

@@ -18,11 +18,9 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWalletProvider = require('@truffle/hdwallet-provider')
+
+const { mnemonic, projectId } = require('./file/secrets.json')
 
 module.exports = {
   /**
@@ -47,6 +45,27 @@ module.exports = {
     //  port: 8545,            // Standard Ethereum port (default: none)
     //  network_id: "*",       // Any network (default: none)
     // },
+    gdtestnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://test2.goodata.io`),
+      network_id: 32,       // good data testnet chain id
+      confirmations: 0,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      gasPrice: 1000000000, // 1 gwei (in wei) (default: 100 gwei)
+    },
+    hecotestnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://http-testnet.hecochain.com`),
+      network_id: 256,       // heco testnet chain id
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      gasPrice: 1000000000,  // 1 gwei (in wei) (default: 100 gwei)
+    },
+    hecomainnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://http-mainnet-node.huobichain.com`),
+      network_id: 128,     // heco testnet chain id
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      gasPrice: 1000000000,  // 1 gwei (in wei) (default: 100 gwei)
+    },
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
