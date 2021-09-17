@@ -17,6 +17,7 @@ const isInNFTWhiteList = (addr: Address) :boolean => {
         }
     }
 
+    console.log('address: ', addr, ' not in white list')
     return false
 }
 

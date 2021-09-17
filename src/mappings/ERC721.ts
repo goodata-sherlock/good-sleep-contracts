@@ -33,11 +33,11 @@ export function handleTransfer(event: TransferEvent): void {
     let token: Token
     if (event.params.to.equals(Address.fromHexString(ZERO_ADDRESS))) {
         // burn
-        token = Token.load(tokenId) as Token
+        token = Token.load(event.address + '-' + tokenId) as Token
         token.isBurn = true
     } else if (event.params.from.equals(Address.fromHexString(ZERO_ADDRESS))) {
         // mint
-        token = new Token(tokenId)
+        token = new Token(event.address + '-' + tokenId)
         token.isBurn = false
 
         // update collection
@@ -52,6 +52,7 @@ export function handleTransfer(event: TransferEvent): void {
         }
     }
 
+    token.tokenId = event.params.tokenId
     token.owner = event.params.to
     token.collection = event.address.toHex()
     token.save()
@@ -74,7 +75,7 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
     )
     let tokenContract = ERC721.bind(event.address)
     let uri = tokenContract.tokenURI(event.params.tokenId)
-    entity.token = event.params.tokenId.toHex()
+    entity.token = event.address + '-' + event.params.tokenId.toHex()
     entity.uri = uri
     entity.save()
 
@@ -92,7 +93,7 @@ export function handleApproval(event: ApprovalEvent): void {
     )
     entity.owner = event.params.owner
     entity.approved = event.params.approved
-    entity.token = event.params.tokenId.toHex()
+    entity.token = event.address + '-' + event.params.tokenId.toHex()
     entity.save()
 }
   

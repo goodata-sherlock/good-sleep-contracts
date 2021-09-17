@@ -6,7 +6,8 @@ type TokenCollection @entity {
 }
 
 type Token @entity {
-  id: ID!
+  id: ID! # token address + '-' + tokenId
+  tokenId: BigInt! # uint256
   collection: TokenCollection!
   owner: Bytes!
   uri: String # string
