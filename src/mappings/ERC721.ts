@@ -3,7 +3,8 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import {
-    isInNFTWhiteList
+    isInNFTWhiteList,
+    genTokenID
 } from '../helper'
 
 import {
@@ -29,15 +30,15 @@ export function handleTransfer(event: TransferEvent): void {
     if (!isInNFTWhiteList(event.address)) {
         return
     }
-    let tokenId = event.params.tokenId.toHex()
+    let tokenId = event.params.tokenId
     let token: Token
     if (event.params.to.equals(Address.fromHexString(ZERO_ADDRESS))) {
         // burn
-        token = Token.load(event.address + '-' + tokenId) as Token
+        token = Token.load(genTokenID(event.address, tokenId)) as Token
         token.isBurn = true
     } else if (event.params.from.equals(Address.fromHexString(ZERO_ADDRESS))) {
         // mint
-        token = new Token(event.address + '-' + tokenId)
+        token = new Token(genTokenID(event.address, tokenId))
         token.isBurn = false
 
         // update collection
@@ -62,7 +63,7 @@ export function handleTransfer(event: TransferEvent): void {
     )
     transfer.from = event.params.from
     transfer.to = event.params.to
-    transfer.token = event.params.tokenId.toHex()
+    transfer.token = genTokenID(event.address, event.params.tokenId)
     transfer.save()
 }
 
@@ -75,11 +76,11 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
     )
     let tokenContract = ERC721.bind(event.address)
     let uri = tokenContract.tokenURI(event.params.tokenId)
-    entity.token = event.address + '-' + event.params.tokenId.toHex()
+    entity.token = genTokenID(event.address, event.params.tokenId)
     entity.uri = uri
     entity.save()
 
-    let token = Token.load(event.params.tokenId.toHex())
+    let token = Token.load(genTokenID(event.address, event.params.tokenId))
     token.uri = uri
     token.save()
 }
@@ -93,7 +94,7 @@ export function handleApproval(event: ApprovalEvent): void {
     )
     entity.owner = event.params.owner
     entity.approved = event.params.approved
-    entity.token = event.address + '-' + event.params.tokenId.toHex()
+    entity.token = genTokenID(event.address, event.params.tokenId)
     entity.save()
 }
   

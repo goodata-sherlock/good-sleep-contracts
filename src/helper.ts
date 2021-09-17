@@ -1,5 +1,6 @@
 import {
-    Address
+    Address,
+    BigInt
 } from '@graphprotocol/graph-ts'
 
 const SleepAvatarNFT = '0x2338B7e8189bE74896cD892411A6AFfcDEfC7fa9'
@@ -17,8 +18,11 @@ const isInNFTWhiteList = (addr: Address) :boolean => {
         }
     }
 
-    console.log('address: ', addr, ' not in white list')
     return false
 }
 
-export { SleepAvatarNFT, AppearanceAvatarNFT, NFTWhiteList, isInNFTWhiteList }
+const genTokenID = (addr: Address, tokenId: BigInt) :string => {
+    return addr.toHex() + '-' + tokenId.toHex()
+}
+
+export { SleepAvatarNFT, AppearanceAvatarNFT, NFTWhiteList, isInNFTWhiteList, genTokenID }
