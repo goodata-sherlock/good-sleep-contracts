@@ -39,8 +39,7 @@ contract RewardV1 is Reward {
     }
 
     function _afterFeed(uint256 tokenId, uint256 amount) internal virtual override {
-        uint256 _oldReward = pendingReward[tokenId];
-        pendingReward[tokenId] = _oldReward.add(amount.mul(currReward()));
+        pendingReward[tokenId] = _estimateReward(tokenId, amount);
     }
 
     function _phase() public virtual override view returns(uint256) {
@@ -82,6 +81,11 @@ contract RewardV1 is Reward {
 
     function _reward(uint256 tokenId) public virtual override view returns(uint256) {
         return pendingReward[tokenId];
+    }
+
+    function _estimateReward(uint256 tokenId, uint256 amount) public virtual override view returns(uint256) {
+        uint256 _oldReward = pendingReward[tokenId];
+        return _oldReward.add(amount.mul(currReward()));
     }
 
     function maxAmount() public view returns(uint256) {
