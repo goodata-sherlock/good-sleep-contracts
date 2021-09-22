@@ -6,7 +6,7 @@ const {
     time
 } = require('@openzeppelin/test-helpers');
 const ethSigUtil = require('eth-sig-util');
-const { web3 } = require("@openzeppelin/test-helpers/src/setup");
+const { web3, BN } = require("@openzeppelin/test-helpers/src/setup");
 const Wallet = require('ethereumjs-wallet').default;
 const {
     toBuffer,
@@ -40,6 +40,8 @@ const MetaTxTypes = {
     ],
 }
 
+const BLOCKS_PER_DAY = 50 // 24 * 60 * 60 / 3
+
 contract('Reward', ([alice, bob, carol, dev, backend]) => {
     let rewardContract
     let metaTxContract
@@ -57,6 +59,7 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         this.good = await MockGooD.new({ from: dev })
 
         this.reward = await Reward.new(
+            BLOCKS_PER_DAY,
             this.avatar.address,
             this.good.address,
             this.metaTx.address,
@@ -66,6 +69,75 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         )
         this.reward.transferOwnership(backend, { from: dev })
         rewardContract = new web3.eth.Contract(Reward.abi, this.reward.address)
+
+        await this.good.transfer(this.reward.address, toWei('100000000'), { from: dev })
+
+        // Helper methods
+        this.expectPhase = async (expectNumPhase, expectBlockPhase) => {
+            let numPhase = await this.reward.avatarNumPhase(await this.avatar.getCurrTokenId())
+            let blockPhase = await this.reward.blockPhase(await web3.eth.getBlockNumber())
+            assert.equal(numPhase, expectNumPhase)
+            assert.equal(blockPhase, expectBlockPhase)
+
+            let phase = numPhase >= blockPhase ? numPhase : blockPhase
+            let expectPhase = expectNumPhase >= expectBlockPhase ? expectNumPhase : expectBlockPhase
+
+            assert.equal(phase, expectPhase, 'unexpected phase')
+        }
+
+        this.expectFeed = async (tokenId, amount) => {
+            let feedReceipt = await this.reward.feed(tokenId, amount, { from: backend })
+            const feedEventArgs = testUtils.getEventArgsFromTx(feedReceipt, 'Feeding')
+            assert.equal(
+                feedEventArgs.tokenId.toString(),
+                tokenId.toString(),
+                'unexpected feeding tokenId'
+            )
+
+            assert.equal(
+                feedEventArgs.amount.toString(),
+                amount.toString(),
+                'unexpected feeding amount'
+            )
+        }
+
+        this.expectWithdraw = async (tokenId, expectReward, expectAmount, expectSurplus) => {
+            assert.equal(await this.reward.reward(tokenId), expectReward)
+
+            let owner = await this.avatar.ownerOf(tokenId)
+            let beforeBalance = await this.good.balanceOf(owner)
+
+            let withdrawReceipt = await this.reward.withdraw(tokenId, { from: owner })
+            let withdrawalEventArgs = testUtils.getEventArgsFromTx(withdrawReceipt, 'Withdrawal')
+            let afterBalance = await this.good.balanceOf(owner)
+            assert.equal(
+                withdrawalEventArgs.tokenId.toString(),
+                tokenId.toString(),
+                'tokenId not equal'
+            )
+            assert.equal(
+                withdrawalEventArgs.to,
+                owner,
+                'unexpected recipient of withdrawal'
+            )
+            assert.equal(
+                withdrawalEventArgs.amount.toString(),
+                expectAmount.toString(),
+                'unexpected withdrawal amount'
+            )
+
+            assert.equal(
+                await this.reward.reward(tokenId),
+                expectSurplus,
+                'unexpected surplus reward'
+            )
+
+            assert.equal(
+                afterBalance.toString(),
+                beforeBalance.add(new BN(expectAmount)),
+                'unexpected balance'
+            )
+        }
     })
 
     let aliceAvatarId
@@ -92,15 +164,44 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     })
 
     it('Backend feeds avatars', async() => {
-        let feedReceipt = await this.reward.feed(aliceAvatarId, toWei('1'), { from: backend })
-        const feedEventArgs = testUtils.getEventArgsFromTx(feedReceipt, 'Feeding')
-        assert.equal(feedEventArgs.tokenId.toString(), '1')
-        assert.equal(feedEventArgs.amount.toString(), toWei('1').toString())
+        await this.expectFeed(aliceAvatarId, '1')
+    })
+
+    it('Backend feeds avatar out of max amount', async() => {
+        expectRevert(
+            this.reward.feed(aliceAvatarId, '7', { from: backend }),
+            'RewardV1: out of max amount'
+        )
+    })
+
+    it('Reward', async() => {
+        await this.expectPhase(0, 0)
+        assert.equal(await this.reward.currReward(), toWei('6'))
+        await this.expectWithdraw(aliceAvatarId, toWei('6'), toWei('6'), '0')
+
+        await this.expectFeed(aliceAvatarId, '6')
+        await this.expectWithdraw(aliceAvatarId, toWei('36'), toWei('36'), '0')
+
+        await time.advanceBlockTo('57')
+        await this.expectPhase(0, 1)
+        assert.equal(await this.reward.currReward(), toWei('5'))
+        await this.expectFeed(aliceAvatarId, '7')
+        await this.expectWithdraw(aliceAvatarId, toWei('35'), toWei('35'), '0')
+        await this.expectFeed(carolAvatarId, '7')
+        await this.expectWithdraw(carolAvatarId, toWei('35'), toWei('35'), '0')
+
+        await time.advanceBlockTo('157')
+        await this.expectPhase(0, 3)
+        assert.equal(await this.reward.currReward(), toWei('3'))
+        await this.expectFeed(aliceAvatarId, '7')
+        await this.expectWithdraw(aliceAvatarId, toWei('21'), toWei('21'), '0')
+        await this.expectFeed(carolAvatarId, '7')
+        await this.expectWithdraw(carolAvatarId, toWei('21'), toWei('21'), '0')
     })
 
     it('Feed avatars without power', async() => {
         await expectRevert(
-            this.reward.feed(bobAvatarId, toWei('1'), { from: bob }),
+            this.reward.feed(bobAvatarId, '1', { from: bob }),
             'Ownable: caller is not the owner'
         )
     })
@@ -113,11 +214,11 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.reward.transferOwnership(backend, { from: oldBackend })
         assert.equal((await this.reward.records(bobAvatarId)).toString(), '0')
 
-        let feedMethod = rewardContract.methods.feed(bobAvatarId, toWei('1'))
+        let feedMethod = rewardContract.methods.feed(bobAvatarId, '1')
         let [returndata, receipt] = await mustExecuteMetaTx(wallet, bob, metaTxContract, feedMethod, this.reward.address, '0', this.domain)
         console.log('returndata: ', returndata)
         console.log('receipt: ', receipt)
-        assert.equal((await this.reward.records(bobAvatarId)).toString(), toWei('1'))
+        assert.equal((await this.reward.records(bobAvatarId)).toString(), '1')
     })
 
     it('test sign typed data', async() => {
