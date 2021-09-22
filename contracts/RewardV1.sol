@@ -85,7 +85,7 @@ contract RewardV1 is Reward {
 
     function _estimateReward(uint256 tokenId, uint256 amount) public virtual override view returns(uint256) {
         uint256 _oldReward = pendingReward[tokenId];
-        return _oldReward.add(amount.mul(currReward()));
+        return _oldReward.add(amount.mul(currReward()).mul(multiplier).div(10**18));
     }
 
     function maxAmount() public view returns(uint256) {
