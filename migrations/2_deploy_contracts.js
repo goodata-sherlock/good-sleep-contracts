@@ -6,6 +6,8 @@ const RewardV1 = artifacts.require('RewardV1')
 
 const { toWei, fromWei } = web3.utils
 
+const BLOCKS_PER_DAY = 24 * 60 * 60 / 3
+
 module.exports = async (deployer, network) => {
     console.log(">>>>> network: ", network)
     await deploy(deployer, network)
@@ -44,7 +46,7 @@ const deployContractsInTestnet = async (deployer) => {
     let good = await MockGooD.deployed()
     deployedContracts.good = good.address
 
-    await deployer.deploy(RewardV1, sleepAvatar.address, good.address, metaTx.address)
+    await deployer.deploy(RewardV1, BLOCKS_PER_DAY, sleepAvatar.address, good.address, metaTx.address)
     let rewardV1 = await RewardV1.deployed()
     deployedContracts.rewardV1 = rewardV1.address
 

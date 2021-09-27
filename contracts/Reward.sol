@@ -49,7 +49,7 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         return _phase();
     }
 
-    function _phase() public virtual view returns(uint256) {
+    function _phase() internal virtual view returns(uint256) {
         return 0;
     }
 
@@ -57,7 +57,7 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         return _reward(tokenId);
     }
 
-    function _reward(uint256 tokenId) public virtual view returns(uint256) {
+    function _reward(uint256 tokenId) internal virtual view returns(uint256) {
         uint256 record = records[tokenId];
         return record.sub(lastRewardRecords[tokenId]);
     }
@@ -66,7 +66,7 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         return _estimateReward(tokenId, amount);
     }
 
-    function _estimateReward(uint256 tokenId, uint256 amount) public virtual view returns(uint256) {
+    function _estimateReward(uint256 tokenId, uint256 amount) internal virtual view returns(uint256) {
         return records[tokenId].sub(lastRewardRecords[tokenId]).add(amount);
     }
 
@@ -82,7 +82,7 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         return amount;
     }
 
-    function _withdraw(uint256 tokenId) public virtual returns(address, uint256) {
+    function _withdraw(uint256 tokenId) internal virtual returns(address, uint256) {
         lastRewardRecords[tokenId] = records[tokenId];
         return (address(0), 0);
     }

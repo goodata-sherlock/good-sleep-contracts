@@ -42,7 +42,7 @@ contract RewardV1 is Reward {
         pendingReward[tokenId] = _estimateReward(tokenId, amount);
     }
 
-    function _phase() public virtual override view returns(uint256) {
+    function _phase() internal virtual override view returns(uint256) {
         return _phase(avatar.getCurrTokenId(), block.number);
     }
 
@@ -79,11 +79,11 @@ contract RewardV1 is Reward {
         return initialRewardPerDay.sub(_base.mul(_currPhase));
     }
 
-    function _reward(uint256 tokenId) public virtual override view returns(uint256) {
+    function _reward(uint256 tokenId) internal virtual override view returns(uint256) {
         return pendingReward[tokenId];
     }
 
-    function _estimateReward(uint256 tokenId, uint256 amount) public virtual override view returns(uint256) {
+    function _estimateReward(uint256 tokenId, uint256 amount) internal virtual override view returns(uint256) {
         uint256 _oldReward = pendingReward[tokenId];
         return _oldReward.add(amount.mul(currReward()).mul(multiplier).div(10**18));
     }
@@ -100,7 +100,7 @@ contract RewardV1 is Reward {
         return startBlock.add(4 * BLOCKS_PER_WEEK);
     }
 
-    function _withdraw(uint256 tokenId) public virtual override returns(address, uint256) {
+    function _withdraw(uint256 tokenId) internal virtual override returns(address, uint256) {
         uint256 amount = _reward(tokenId);
         require(amount > 0, "RewardV1: pending reward is zero");
         address tokenOwner = avatar.ownerOf(tokenId);
