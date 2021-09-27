@@ -10,7 +10,7 @@ dataSources:
     source:
       # address: ""
       abi: ERC721
-      startBlock: 5529285
+      startBlock: 6563570
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -38,9 +38,9 @@ dataSources:
     name: RewardV1
     network: mainnet
     source:
-      address: "0xbd559D8886D6Cbd2C1086CD1c01811Ddbd5964B8"
+      address: "0xdBD831C193E1908c3828dBe4E4319106C8DE8907"
       abi: Reward
-      startBlock: 5529285
+      startBlock: 6563570
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

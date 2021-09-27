@@ -49,7 +49,7 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         return _phase();
     }
 
-    function _phase() public virtual view returns(uint256) {
+    function _phase() internal virtual view returns(uint256) {
         return 0;
     }
 
@@ -57,9 +57,17 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         return _reward(tokenId);
     }
 
-    function _reward(uint256 tokenId) public virtual view returns(uint256) {
+    function _reward(uint256 tokenId) internal virtual view returns(uint256) {
         uint256 record = records[tokenId];
         return record.sub(lastRewardRecords[tokenId]);
+    }
+
+    function estimateReward(uint256 tokenId, uint256 amount) public view override returns(uint256) {
+        return _estimateReward(tokenId, amount);
+    }
+
+    function _estimateReward(uint256 tokenId, uint256 amount) internal virtual view returns(uint256) {
+        return records[tokenId].sub(lastRewardRecords[tokenId]).add(amount);
     }
 
     function setMultiplier(uint256 _multiplier) public override {
@@ -69,14 +77,14 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
     }
 
     function withdraw(uint256 tokenId) public override returns(uint256) {
-        uint256 amount = _withdraw(tokenId);
-        emit Withdrawal(tokenId, _msgSender(), amount);
+        (address addr, uint256 amount) = _withdraw(tokenId);
+        emit Withdrawal(tokenId, addr, amount);
         return amount;
     }
 
-    function _withdraw(uint256 tokenId) public virtual returns(uint256) {
+    function _withdraw(uint256 tokenId) internal virtual returns(address, uint256) {
         lastRewardRecords[tokenId] = records[tokenId];
-        return 0;
+        return (address(0), 0);
     }
 
     function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {
