@@ -27,7 +27,8 @@ contract RewardV1 is Reward {
 
     function _beforeFeed(uint256 tokenId, uint256 amount) internal virtual override {
         require(endBlock() >= block.number, "RewardV1: out of end block");
-        require(records[tokenId].add(amount) <= maxAmount(), "RewardV1: out of max amount");
+        // amount validation migrates to backend. There is no amount validation.
+        // require(records[tokenId].add(amount) <= maxAmount(), "RewardV1: out of max amount");
         bool isExistentAvatar = false;
         try avatar.ownerOf(tokenId) returns(address _owner) {
             isExistentAvatar = _owner != address(0);
@@ -88,9 +89,9 @@ contract RewardV1 is Reward {
         return _oldReward.add(amount.mul(currReward()).mul(multiplier).div(10**18));
     }
 
-    function maxAmount() public view returns(uint256) {
-        return _phase().add(1).mul(7);
-    }
+    // function maxAmount() public view returns(uint256) {
+    //     return _phase().add(1).mul(7);
+    // }
 
     function phaseTime() public virtual pure returns(uint256) {
         return 1 weeks;

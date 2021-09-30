@@ -167,12 +167,12 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.expectFeed(aliceAvatarId, '1')
     })
 
-    it('Backend feeds avatar out of max amount', async() => {
-        expectRevert(
-            this.reward.feed(aliceAvatarId, '7', { from: backend }),
-            'RewardV1: out of max amount'
-        )
-    })
+    // it('Backend feeds avatar out of max amount', async() => {
+    //     expectRevert(
+    //         this.reward.feed(aliceAvatarId, '7', { from: backend }),
+    //         'RewardV1: out of max amount'
+    //     )
+    // })
 
     it('Reward', async() => {
         await this.expectPhase(0, 0)
