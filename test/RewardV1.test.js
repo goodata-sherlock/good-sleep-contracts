@@ -40,7 +40,8 @@ const MetaTxTypes = {
     ],
 }
 
-const BLOCKS_PER_DAY = 50 // 24 * 60 * 60 / 3
+const BLOCKS_PER_DAY = 4 // 24 * 60 * 60 / 3
+const BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY
 
 contract('Reward', ([alice, bob, carol, dev, backend]) => {
     let rewardContract
@@ -76,8 +77,8 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         this.expectPhase = async (expectNumPhase, expectBlockPhase) => {
             let numPhase = await this.reward.avatarNumPhase(await this.avatar.getCurrTokenId())
             let blockPhase = await this.reward.blockPhase(await web3.eth.getBlockNumber())
-            assert.equal(numPhase, expectNumPhase)
-            assert.equal(blockPhase, expectBlockPhase)
+            assert.equal(numPhase, expectNumPhase, 'unexpected numPhase')
+            assert.equal(blockPhase, expectBlockPhase, 'unexpected blockPhase')
 
             let phase = numPhase >= blockPhase ? numPhase : blockPhase
             let expectPhase = expectNumPhase >= expectBlockPhase ? expectNumPhase : expectBlockPhase
@@ -182,7 +183,11 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.expectFeed(aliceAvatarId, '6')
         await this.expectWithdraw(aliceAvatarId, toWei('36'), toWei('36'), '0')
 
-        await time.advanceBlockTo('57')
+        // start block => 7
+        await time.advanceBlockTo('34')
+        await this.expectPhase(0, 0)
+
+        await time.advanceBlockTo('35') // 7 + 28
         await this.expectPhase(0, 1)
         assert.equal(await this.reward.currReward(), toWei('5'))
         await this.expectFeed(aliceAvatarId, '7')
@@ -190,7 +195,7 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.expectFeed(carolAvatarId, '7')
         await this.expectWithdraw(carolAvatarId, toWei('35'), toWei('35'), '0')
 
-        await time.advanceBlockTo('157')
+        await time.advanceBlockTo('91') // 7 + 28*3
         await this.expectPhase(0, 3)
         assert.equal(await this.reward.currReward(), toWei('3'))
         await this.expectFeed(aliceAvatarId, '7')

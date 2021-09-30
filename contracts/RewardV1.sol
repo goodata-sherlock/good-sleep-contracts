@@ -68,7 +68,7 @@ contract RewardV1 is Reward {
     function blockPhase(uint256 currBlock) public view returns(uint256) {
         require(currBlock >= startBlock, "RewardV1: curr block less than start block");
         uint256 duration = currBlock.sub(startBlock);
-        return duration > 4 * BLOCKS_PER_WEEK ? 3 : duration.div(1 * BLOCKS_PER_DAY);
+        return duration > 4 * BLOCKS_PER_WEEK ? 3 : duration.div(1 * BLOCKS_PER_WEEK);
     }
 
     function currReward() public view returns(uint256) {
