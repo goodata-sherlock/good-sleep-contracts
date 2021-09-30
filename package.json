@@ -7,7 +7,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy example --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy example --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy-local": "graph deploy example --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
     "deploy-gdtestnet": "graph deploy example --ipfs http://10.100.129.225:5001 --node http://10.100.19.112:8020"
   },
   "devDependencies": {
