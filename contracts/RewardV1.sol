@@ -26,7 +26,6 @@ contract RewardV1 is Reward {
     }
 
     function _beforeFeed(uint256 tokenId, uint256 amount) internal virtual override {
-        require(endBlock() >= block.number, "RewardV1: out of end block");
         // amount validation migrates to backend. There is no amount validation.
         // require(records[tokenId].add(amount) <= maxAmount(), "RewardV1: out of max amount");
         bool isExistentAvatar = false;
@@ -60,15 +59,23 @@ contract RewardV1 is Reward {
             return 1;
         } else if (avatarNum <= 30000) {
             return 2;
-        } else {
+        } else if (avatarNum <= 50000) {
             return 3;
+        } else if (avatarNum <= 100000) {
+            return 4;
+        } else if (avatarNum <= 200000) {
+            return 5;
+        } else if (avatarNum <= 350000) {
+            return 6;
+        } else { // <= 500000
+            return 7;
         }
     }
 
     function blockPhase(uint256 currBlock) public view returns(uint256) {
         require(currBlock >= startBlock, "RewardV1: curr block less than start block");
         uint256 duration = currBlock.sub(startBlock);
-        return duration > 4 * BLOCKS_PER_WEEK ? 3 : duration.div(1 * BLOCKS_PER_WEEK);
+        return duration > 8 * BLOCKS_PER_WEEK ? 7 : duration.div(1 * BLOCKS_PER_WEEK);
     }
 
     function currReward() public view returns(uint256) {
@@ -77,11 +84,21 @@ contract RewardV1 is Reward {
 
     function _currReward(uint256 _currPhase) public view returns(uint256) {
         uint256 _base = 1*10**18;
-        return initialRewardPerDay.sub(_base.mul(_currPhase));
+        if (_currPhase < 4) {
+            return initialRewardPerDay.sub(_base.mul(_currPhase));
+        } else if (_currPhase < 6) {
+            return 2*10**18; // 2
+        } else {
+            return 15*10**17; // 1.5
+        }
     }
 
     function _reward(uint256 tokenId) internal virtual override view returns(uint256) {
         return pendingReward[tokenId];
+    }
+
+    function _rewardSurplus() public virtual override view returns(uint256) {
+        return good.balanceOf(address(this));
     }
 
     function _estimateReward(uint256 tokenId, uint256 amount) internal virtual override view returns(uint256) {
@@ -95,10 +112,6 @@ contract RewardV1 is Reward {
 
     function phaseTime() public virtual pure returns(uint256) {
         return 1 weeks;
-    }
-
-    function endBlock() public virtual view returns(uint256) {
-        return startBlock.add(4 * BLOCKS_PER_WEEK);
     }
 
     function _withdraw(uint256 tokenId) internal virtual override returns(address, uint256) {

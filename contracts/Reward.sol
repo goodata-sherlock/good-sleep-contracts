@@ -62,6 +62,14 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         return record.sub(lastRewardRecords[tokenId]);
     }
 
+    function rewardSurplus() public view override returns(uint256) {
+        return _rewardSurplus();
+    }
+
+    function _rewardSurplus() public virtual view returns(uint256) {
+        return 0;
+    }
+
     function estimateReward(uint256 tokenId, uint256 amount) public view override returns(uint256) {
         return _estimateReward(tokenId, amount);
     }
