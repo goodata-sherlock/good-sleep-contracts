@@ -3,8 +3,8 @@ import {
     BigInt
 } from '@graphprotocol/graph-ts'
 
-const SleepAvatarNFT = '0x8e3912653f1137EBaA74402C51BdAF9756d9f86b'
-const AppearanceAvatarNFT = '0x5CD4beA5d0C71c8419C43bf6dFBB9c50387D77cc'
+const SleepAvatarNFT = '0xDE45bb347AdA4a70afA81FdbF859163343114066'
+const AppearanceAvatarNFT = '0xd755dC78909533C2C617cad5DEA8280878536eDe'
 
 let NFTWhiteList: Array<string> = [
     SleepAvatarNFT,
