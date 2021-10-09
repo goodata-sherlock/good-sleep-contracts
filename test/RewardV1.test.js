@@ -141,6 +141,10 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         }
     })
 
+    it('rewardSurplus', async () => {
+        assert.equal(await this.reward.rewardSurplus(), toWei('100000000'), 'rewardSurplus incorrect')
+    })
+
     let aliceAvatarId
     let bobAvatarId
     let carolAvatarId
