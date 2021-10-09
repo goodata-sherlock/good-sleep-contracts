@@ -1,5 +1,5 @@
 specVersion: 0.0.2
-description: ERC721 Example
+description: good sleep subgraph
 repository: https://github.com/good-data-foundation/good-sleep-contracts
 schema:
   file: ./schema.graphql
