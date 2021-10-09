@@ -1,0 +1,74 @@
+type TokenCollection @entity {
+  id: ID! # address of ERC721
+  name: String!
+  symbol: String!
+  tokens: [Token!]! @derivedFrom(field: "collection")
+}
+
+type Token @entity {
+  id: ID! # token address + '-' + tokenId
+  tokenId: BigInt! # uint256
+  collection: TokenCollection!
+  owner: Bytes!
+  uri: String # string
+  isBurn: Boolean!
+  approvals: [Approval!]! @derivedFrom(field: "token")
+  uriUpdates: [TokenURIUpdated!]! @derivedFrom(field: "token")
+  transfers: [Transfer!]! @derivedFrom(field: "token")
+}
+
+type Approval @entity {
+  id: ID!
+  owner: Bytes! # address
+  approved: Bytes! # address
+  token: Token!
+}
+
+type ApprovalForAll @entity {
+  id: ID!
+  owner: Bytes! # address
+  operator: Bytes! # address
+  approved: Boolean! # bool
+}
+
+type TokenURIUpdated @entity {
+  id: ID!
+  uri: String! # string
+  token: Token!
+}
+
+type Transfer @entity {
+  id: ID!
+  from: Bytes! # address
+  to: Bytes! # address
+  token: Token!
+}
+
+type RewardRecord @entity {
+  id: ID! # uint256 tokenId
+  feeds: [FeedRecord!]! @derivedFrom(field: "rewardRecord")
+  withdrawals: [RewardWithdrawal!]!  @derivedFrom(field: "rewardRecord")
+  totalWithdrawal: BigInt!
+}
+
+type FeedRecord @entity {
+  id: ID!
+  tokenId: BigInt! # uint256
+  amount: BigInt! # uint256
+  rewardRecord: RewardRecord!
+}
+
+type RewardWithdrawal @entity {
+  id: ID!
+  tokenId: BigInt! # uint256
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  time: BigInt! # uint256
+  rewardRecord: RewardRecord!
+}
+
+type MultiplierUpdated @entity {
+  id: ID!
+  oldMultiplier: BigInt! # uint256
+  newMultiplier: BigInt! # uint256
+}
