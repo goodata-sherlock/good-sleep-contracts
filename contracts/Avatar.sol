@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL3.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/metaTx/ERC2771Context.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
