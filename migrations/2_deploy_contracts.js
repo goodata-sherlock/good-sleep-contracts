@@ -22,15 +22,22 @@ let deployedContracts = {
     sleepAvatar: '',
     appearanceAvatar: '',
     rewardV1: '',
+    startBlock: 0,
 }
 
 const deploy = async (deployer, network) => {
+    deployedContracts.startBlock = await web3.eth.getBlockNumber()
     if (network.indexOf('testnet') != -1) {
         await deployContractsInTestnet(deployer)
     }
 
-    console.log('deployedContracts: ', deployedContracts)
-    fs.writeFileSync('./deployedContracts.json', JSON.stringify(deployedContracts, null, 2))
+    if (network != 'test' || network != 'development') {
+        console.log('deployedContracts: ', deployedContracts)
+        
+        let obj = JSON.parse(fs.readFileSync('./deployedContracts.json'))
+        obj[network] = deployedContracts
+        fs.writeFileSync('./deployedContracts.json', JSON.stringify(obj, null, 2))
+    }
 }
 
 const deployContractsInTestnet = async (deployer) => {
