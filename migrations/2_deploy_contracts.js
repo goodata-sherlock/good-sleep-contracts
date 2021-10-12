@@ -29,6 +29,9 @@ const deploy = async (deployer, network) => {
     deployedContracts.startBlock = await web3.eth.getBlockNumber()
     if (network.indexOf('testnet') != -1) {
         await deployContractsInTestnet(deployer)
+    } else if (network == 'bscmainnet') {
+        let goodAddr = '0xdc2e61eb09566135eedfda573f9cc29adbb3d240'
+        await deployContractsInMainnet(deployer, goodAddr)
     }
 
     if (network != 'test' || network != 'development') {
@@ -40,7 +43,7 @@ const deploy = async (deployer, network) => {
     }
 }
 
-const deployContractsInTestnet = async (deployer) => {
+const deployContractsInMainnet = async (deployer, goodAddr) => {
     await deployer.deploy(MetaTx)
     let metaTx = await MetaTx.deployed()
     deployedContracts.metaTx = metaTx.address
@@ -53,9 +56,29 @@ const deployContractsInTestnet = async (deployer) => {
     let appearanceAvatar = await AppearanceAvatar.deployed()
     deployedContracts.appearanceAvatar = appearanceAvatar.address
 
+    deployedContracts.good = goodAddr
+
+    await deployer.deploy(RewardV1, BLOCKS_PER_DAY, sleepAvatar.address, goodAddr, metaTx.address)
+    let rewardV1 = await RewardV1.deployed()
+    deployedContracts.rewardV1 = rewardV1.address
+}
+
+const deployContractsInTestnet = async (deployer) => {
     await deployer.deploy(MockGooD)
     let good = await MockGooD.deployed()
     deployedContracts.good = good.address
+
+    await deployer.deploy(MetaTx)
+    let metaTx = await MetaTx.deployed()
+    deployedContracts.metaTx = metaTx.address
+
+    await deployer.deploy(SleepAvatar, metaTx.address)
+    let sleepAvatar = await SleepAvatar.deployed()
+    deployedContracts.sleepAvatar = sleepAvatar.address
+
+    await deployer.deploy(AppearanceAvatar, metaTx.address)
+    let appearanceAvatar = await AppearanceAvatar.deployed()
+    deployedContracts.appearanceAvatar = appearanceAvatar.address
 
     await deployer.deploy(RewardV1, BLOCKS_PER_DAY_FOR_TEST, sleepAvatar.address, good.address, metaTx.address)
     let rewardV1 = await RewardV1.deployed()
