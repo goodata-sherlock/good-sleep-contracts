@@ -175,6 +175,7 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
 
     it('Backend feeds avatars', async() => {
         await this.expectFeed(aliceAvatarId, '1', false)
+        assert.equal((await this.reward.avatarCount()).toString(), '1')
     })
 
     // it('Backend feeds avatar out of max amount', async() => {
@@ -190,6 +191,8 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.expectWithdraw(aliceAvatarId, toWei('6'), toWei('6'), '0')
 
         await this.expectFeed(aliceAvatarId, '6', false)
+        assert.equal((await this.reward.avatarCount()).toString(), '1', 'avatarCount shoud still be 1')
+
         await this.expectWithdraw(aliceAvatarId, toWei('36'), toWei('36'), '0')
 
         // start block => 7
@@ -206,6 +209,11 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.expectWithdraw(aliceAvatarId, toWei('35'), toWei('35'), '0')
 
         await this.expectFeed(carolAvatarId, '7', false)
+        assert.equal((
+            await this.reward.avatarCount()).toString(),
+            '2',
+            'avatarCount should be 2 when firstly feed carcolAvatar'
+        )
         await this.expectWithdraw(carolAvatarId, toWei('35'), toWei('35'), '0')
 
         // switch to phase 3 by increasing block number

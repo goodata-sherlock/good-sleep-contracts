@@ -15,6 +15,7 @@ contract RewardV1 is Reward {
     uint256 public avatarCount;
     ERC20 good;
     mapping(uint256 => uint256) pendingReward;
+    mapping(uint256 => bool) isAvatarExist;
     uint256 public startBlock;
 
     //////////////////////////////////////////////////////////
@@ -53,10 +54,11 @@ contract RewardV1 is Reward {
     }
 
     function _afterFeed(uint256 tokenId, uint256 amount) internal virtual override {
-        if (pendingReward[tokenId] == 0) {
+        if (isAvatarExist[tokenId] == false) {
+            isAvatarExist[tokenId] = true;
             avatarCount = avatarCount.add(1);
-            updatePhase();
         }
+        updatePhase();
         pendingReward[tokenId] = _estimateReward(tokenId, amount);
     }
 

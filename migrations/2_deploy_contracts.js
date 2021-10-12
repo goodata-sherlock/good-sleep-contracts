@@ -34,7 +34,7 @@ const deploy = async (deployer, network) => {
         await deployContractsInMainnet(deployer, goodAddr)
     }
 
-    if (network != 'test' || network != 'development') {
+    if (network != 'test' && network != 'development') {
         console.log('deployedContracts: ', deployedContracts)
         
         let obj = JSON.parse(fs.readFileSync('./deployedContracts.json'))
