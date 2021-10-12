@@ -9,11 +9,24 @@ import "./Avatar.sol";
 contract RewardV1 is Reward {
     using SafeMath for uint256;
 
+    event BlockPhaseUpdated(uint256 phase);
+
     Avatar avatar;
+    uint256 public avatarCount;
     ERC20 good;
     mapping(uint256 => uint256) pendingReward;
     uint256 public startBlock;
-    uint256 public initialRewardPerDay = 6 * 10**18;
+
+    //////////////////////////////////////////////////////////
+    // updated when                                         //
+    // avatarNumPhase > blockPhase                          //
+    // or                                                   //
+    // (currBlock - lastBlock) / BLOCKS_PER_WEEK >= 1       //
+    uint256 public lastBlock;                               //
+    uint256 public lastBlockPhase;                          //
+    //////////////////////////////////////////////////////////
+
+    uint256 public initialRewardPerDay = 6 * 10**18; // TODO: initialRewardPerAmount
     uint256 public BLOCKS_PER_DAY;
     uint256 public BLOCKS_PER_WEEK;
 
@@ -22,6 +35,7 @@ contract RewardV1 is Reward {
         BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY;
         avatar = Avatar(_avatar);
         startBlock = block.number;
+        lastBlock = startBlock;
         good = ERC20(_good);
     }
 
@@ -39,17 +53,48 @@ contract RewardV1 is Reward {
     }
 
     function _afterFeed(uint256 tokenId, uint256 amount) internal virtual override {
+        if (pendingReward[tokenId] == 0) {
+            avatarCount = avatarCount.add(1);
+            updatePhase();
+        }
         pendingReward[tokenId] = _estimateReward(tokenId, amount);
     }
 
-    function _phase() internal virtual override view returns(uint256) {
-        return _phase(avatar.getCurrTokenId(), block.number);
+    function updatePhase() public {
+        updateBlockPhase();
+        uint256 _numPhase = avatarNumPhase(avatarCount);
+        uint256 _blockPhase = blockPhase();
+        if (_numPhase > _blockPhase) {
+            lastBlock = block.number;
+            lastBlockPhase = _numPhase;
+        }
     }
 
-    function _phase(uint256 avatarNum, uint256 currBlock) internal view returns(uint256) {
+    function updateBlockPhase() internal {
+        uint256 phaseNum = increasedBlockPhaseNum();
+        if (phaseNum >= 1) {
+            lastBlockPhase = lastBlockPhase.add(phaseNum);
+            lastBlock = lastBlock.add(phaseNum * BLOCKS_PER_WEEK); // rather than lastBlock = block.number
+            emit BlockPhaseUpdated(lastBlockPhase);
+        }
+    }
+
+    /** 
+    * @dev Increase phase when the number of avatar exceeds range or
+    *      time exceeds 1 week in that phase
+    */
+    function _phase() internal virtual override view returns(uint256) {
+        return _phase(avatarCount);
+    }
+
+    function _phase(uint256 avatarNum) internal view returns(uint256) {
         uint256 _numPhase = avatarNumPhase(avatarNum);
-        uint256 _blockPhase = blockPhase(currBlock);
+        uint256 _blockPhase = blockPhase();
         return _numPhase > _blockPhase ? _numPhase : _blockPhase;
+    }
+
+    function maxPhse() public pure returns(uint256) {
+        return 7;
     }
 
     function avatarNumPhase(uint256 avatarNum) public pure returns(uint256) {
@@ -68,14 +113,18 @@ contract RewardV1 is Reward {
         } else if (avatarNum <= 350000) {
             return 6;
         } else { // <= 500000
-            return 7;
+            return maxPhse(); // 7
         }
     }
 
-    function blockPhase(uint256 currBlock) public view returns(uint256) {
-        require(currBlock >= startBlock, "RewardV1: curr block less than start block");
-        uint256 duration = currBlock.sub(startBlock);
-        return duration > 8 * BLOCKS_PER_WEEK ? 7 : duration.div(1 * BLOCKS_PER_WEEK);
+    function increasedBlockPhaseNum() public view returns(uint256) {
+        uint256 phaseNum = (block.number.sub(lastBlock)).div(BLOCKS_PER_WEEK);
+        phaseNum = phaseNum.add(lastBlockPhase) <= maxPhse()? phaseNum: 0;
+        return phaseNum;
+    }
+
+    function blockPhase() public view returns(uint256) {
+        return lastBlockPhase.add(increasedBlockPhaseNum());
     }
 
     function currReward() public view returns(uint256) {
@@ -104,14 +153,6 @@ contract RewardV1 is Reward {
     function _estimateReward(uint256 tokenId, uint256 amount) internal virtual override view returns(uint256) {
         uint256 _oldReward = pendingReward[tokenId];
         return _oldReward.add(amount.mul(currReward()).mul(multiplier).div(10**18));
-    }
-
-    // function maxAmount() public view returns(uint256) {
-    //     return _phase().add(1).mul(7);
-    // }
-
-    function phaseTime() public virtual pure returns(uint256) {
-        return 1 weeks;
     }
 
     function _withdraw(uint256 tokenId) internal virtual override returns(address, uint256) {
