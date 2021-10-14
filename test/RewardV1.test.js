@@ -74,19 +74,18 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.good.transfer(this.reward.address, toWei('100000000'), { from: dev })
 
         // Helper methods
-        this.expectPhase = async (expectNumPhase, expectBlockPhase) => {
-            let numPhase = await this.reward.avatarNumPhase(await this.avatar.getCurrTokenId())
-            let blockPhase = await this.reward.blockPhase(await web3.eth.getBlockNumber())
+        this.expectPhase = async (expectNumPhase, expectBlockPhase, expectPhase) => {
+            let numPhase = await this.reward.avatarNumPhase(await this.reward.avatarCount())
+            let blockPhase = await this.reward.blockPhase()
             assert.equal(numPhase, expectNumPhase, 'unexpected numPhase')
             assert.equal(blockPhase, expectBlockPhase, 'unexpected blockPhase')
 
-            let phase = numPhase >= blockPhase ? numPhase : blockPhase
-            let expectPhase = expectNumPhase >= expectBlockPhase ? expectNumPhase : expectBlockPhase
+            let phase = await this.reward.phase()
 
             assert.equal(phase, expectPhase, 'unexpected phase')
         }
 
-        this.expectFeed = async (tokenId, amount) => {
+        this.expectFeed = async (tokenId, amount, isBlockPhaseUpdated, expectPhase) => {
             let feedReceipt = await this.reward.feed(tokenId, amount, { from: backend })
             const feedEventArgs = testUtils.getEventArgsFromTx(feedReceipt, 'Feeding')
             assert.equal(
@@ -100,10 +99,16 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
                 amount.toString(),
                 'unexpected feeding amount'
             )
+
+            if (isBlockPhaseUpdated) {
+                const phaseUpdated = testUtils.getEventArgsFromTx(feedReceipt, 'BlockPhaseUpdated')
+                assert.notEqual(phaseUpdated, null, 'no phase update')
+                assert.equal(phaseUpdated.phase, expectPhase, 'wrong phase after feeding')
+            }
         }
 
         this.expectWithdraw = async (tokenId, expectReward, expectAmount, expectSurplus) => {
-            assert.equal(await this.reward.reward(tokenId), expectReward)
+            assert.equal((await this.reward.reward(tokenId)).toString(), expectReward, 'unexpected pending reward')
 
             let owner = await this.avatar.ownerOf(tokenId)
             let beforeBalance = await this.good.balanceOf(owner)
@@ -169,7 +174,8 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     })
 
     it('Backend feeds avatars', async() => {
-        await this.expectFeed(aliceAvatarId, '1')
+        await this.expectFeed(aliceAvatarId, '1', false)
+        assert.equal((await this.reward.avatarCount()).toString(), '1')
     })
 
     // it('Backend feeds avatar out of max amount', async() => {
@@ -179,30 +185,56 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     //     )
     // })
 
-    it('Reward', async() => {
-        await this.expectPhase(0, 0)
+    it('Phase', async() => {
+        await this.expectPhase(0, 0, 0)
         assert.equal(await this.reward.currReward(), toWei('6'))
         await this.expectWithdraw(aliceAvatarId, toWei('6'), toWei('6'), '0')
 
-        await this.expectFeed(aliceAvatarId, '6')
+        await this.expectFeed(aliceAvatarId, '6', false)
+        assert.equal((await this.reward.avatarCount()).toString(), '1', 'avatarCount shoud still be 1')
+
         await this.expectWithdraw(aliceAvatarId, toWei('36'), toWei('36'), '0')
 
         // start block => 7
         await time.advanceBlockTo('34')
-        await this.expectPhase(0, 0)
+        await this.expectPhase(0, 0, 0)
 
+        // switch to phase 1 by increasing block number
         await time.advanceBlockTo('35') // 7 + 28
-        await this.expectPhase(0, 1)
+        await this.expectPhase(0, 1, 1)
         assert.equal(await this.reward.currReward(), toWei('5'))
-        await this.expectFeed(aliceAvatarId, '7')
+        await this.expectFeed(aliceAvatarId, '7', true, 1)
+        assert.equal(await this.reward.lastBlock(), '35')
+        assert.equal((await this.reward.increasedBlockPhaseNum()).toString(), '0')
         await this.expectWithdraw(aliceAvatarId, toWei('35'), toWei('35'), '0')
-        await this.expectFeed(carolAvatarId, '7')
+
+        await this.expectFeed(carolAvatarId, '7', false)
+        assert.equal((
+            await this.reward.avatarCount()).toString(),
+            '2',
+            'avatarCount should be 2 when firstly feed carcolAvatar'
+        )
         await this.expectWithdraw(carolAvatarId, toWei('35'), toWei('35'), '0')
 
+        // switch to phase 3 by increasing block number
         await time.advanceBlockTo('91') // 7 + 28*3
-        await this.expectPhase(0, 3)
+        assert.equal(await this.reward.lastBlock(), '35', 'lastBlock of reward contract should be not updated')
+        assert.equal(
+            (await this.reward.lastBlockPhase()).toString(),
+            '1',
+            'lastBlockPhase should be 1'
+        )
+        assert.equal(
+            (await this.reward.increasedBlockPhaseNum()).toString(),
+            '2',
+            'increasedBlockPhaseNum should be 2'
+        )
+
+        await this.expectPhase(0, 3, 3)
         assert.equal(await this.reward.currReward(), toWei('3'))
-        await this.expectFeed(aliceAvatarId, '7')
+        await this.expectFeed(aliceAvatarId, '7', true, 3)
+        assert.equal(await this.reward.lastBlock(), '91', 'lastBlock should be the start block of phase 3')
+
         await this.expectWithdraw(aliceAvatarId, toWei('21'), toWei('21'), '0')
         await this.expectFeed(carolAvatarId, '7')
         await this.expectWithdraw(carolAvatarId, toWei('21'), toWei('21'), '0')

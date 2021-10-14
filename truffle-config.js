@@ -66,6 +66,20 @@ module.exports = {
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       gasPrice: 1000000000,  // 1 gwei (in wei) (default: 100 gwei)
     },
+    bsctestnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,       // bsc testnet chain id
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      gasPrice: 10000000000,  // 10 gwei (in wei) (default: 100 gwei)
+    },
+    bscmainnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed.binance.org`),
+      network_id: 56,     // bsc testnet chain id
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      gasPrice: 10000000000,  // 10 gwei (in wei) (default: 100 gwei)
+    },
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
