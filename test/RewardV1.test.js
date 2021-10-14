@@ -14,7 +14,7 @@ const {
 } = require("ethereumjs-util");
 
 const SleepAvatar = artifacts.require('SleepAvatar')
-const Reward = artifacts.require('RewardV1')
+const Reward = artifacts.require('RewardV1ForTest')
 const MetaTx = artifacts.require('MetaTx')
 const MockGooD = artifacts.require('MockGooD')
 
@@ -60,7 +60,6 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         this.good = await MockGooD.new({ from: dev })
 
         this.reward = await Reward.new(
-            BLOCKS_PER_DAY,
             this.avatar.address,
             this.good.address,
             this.metaTx.address,

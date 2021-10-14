@@ -3,6 +3,7 @@ const MockGooD = artifacts.require('MockGooD')
 const SleepAvatar = artifacts.require('SleepAvatar')
 const AppearanceAvatar = artifacts.require('AppearanceAvatar')
 const RewardV1 = artifacts.require('RewardV1')
+const RewardV1ForTest = artifacts.require('RewardV1ForTest')
 
 const { toWei, fromWei } = web3.utils
 
@@ -58,7 +59,7 @@ const deployContractsInMainnet = async (deployer, goodAddr) => {
 
     deployedContracts.good = goodAddr
 
-    await deployer.deploy(RewardV1, BLOCKS_PER_DAY, sleepAvatar.address, goodAddr, metaTx.address)
+    await deployer.deploy(RewardV1, sleepAvatar.address, goodAddr, metaTx.address)
     let rewardV1 = await RewardV1.deployed()
     deployedContracts.rewardV1 = rewardV1.address
 }
@@ -80,8 +81,8 @@ const deployContractsInTestnet = async (deployer) => {
     let appearanceAvatar = await AppearanceAvatar.deployed()
     deployedContracts.appearanceAvatar = appearanceAvatar.address
 
-    await deployer.deploy(RewardV1, BLOCKS_PER_DAY_FOR_TEST, sleepAvatar.address, good.address, metaTx.address)
-    let rewardV1 = await RewardV1.deployed()
+    await deployer.deploy(RewardV1ForTest, sleepAvatar.address, good.address, metaTx.address)
+    let rewardV1 = await RewardV1ForTest.deployed()
     deployedContracts.rewardV1 = rewardV1.address
 
     // Lock enough token to Reward contract

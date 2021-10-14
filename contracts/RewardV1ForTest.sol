@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./RewardV1Template.sol";
 
-contract RewardV1 is RewardV1Template {
+contract RewardV1ForTest is RewardV1Template {
     using SafeMath for uint256;
 
     uint256 public initialRewardPerAmount = 6 * 10**18;
@@ -18,8 +18,7 @@ contract RewardV1 is RewardV1Template {
     }
 
     function blocksPerPhase() public override pure returns(uint256) {
-        // BLOCKS_PER_PHASE = 7 * BLOCKS_PER_DAY
-        return 7 * (24 * 60 * 60 / 3);
+        return 28;
     }
 
     function avatarNumPhase(uint256 avatarNum) public override pure returns(uint256) {

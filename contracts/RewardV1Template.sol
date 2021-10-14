@@ -22,17 +22,12 @@ contract RewardV1Template is Reward {
     // updated when                                         //
     // avatarNumPhase > blockPhase                          //
     // or                                                   //
-    // (currBlock - lastBlock) / BLOCKS_PER_WEEK >= 1       //
+    // (currBlock - lastBlock) / BLOCKS_PER_PHASE >= 1      //
     uint256 public lastBlock;                               //
     uint256 public lastBlockPhase;                          //
     //////////////////////////////////////////////////////////
 
-    uint256 public BLOCKS_PER_DAY;
-    uint256 public BLOCKS_PER_WEEK;
-
-    constructor(uint256 _blocks_per_day, address _avatar, address _good, address trustedForwarder) Reward(trustedForwarder) {
-        BLOCKS_PER_DAY = _blocks_per_day;
-        BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY;
+    constructor(address _avatar, address _good, address trustedForwarder) Reward(trustedForwarder) {
         avatar = Avatar(_avatar);
         startBlock = block.number;
         lastBlock = startBlock;
@@ -122,8 +117,8 @@ contract RewardV1Template is Reward {
     /**
     * @dev need to implement in child contract.
      */
-    function blocksPerPhase() public virtual view returns(uint256) {
-        return BLOCKS_PER_WEEK;
+    function blocksPerPhase() public virtual pure returns(uint256) {
+        return 10000;
     }
 
     function currReward() public view returns(uint256) {
