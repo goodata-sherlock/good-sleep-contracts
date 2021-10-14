@@ -9,12 +9,13 @@ import "./Avatar.sol";
 contract RewardV1 is Reward {
     using SafeMath for uint256;
 
-    event BlockPhaseUpdated(uint256 phase);
+    event BlockPhaseUpdated(uint256 lastBlock, uint256 phase);
 
     Avatar avatar;
     uint256 public avatarCount;
     ERC20 good;
     mapping(uint256 => uint256) pendingReward;
+    mapping(uint256 => bool) isAvatarExist;
     uint256 public startBlock;
 
     //////////////////////////////////////////////////////////
@@ -26,7 +27,7 @@ contract RewardV1 is Reward {
     uint256 public lastBlockPhase;                          //
     //////////////////////////////////////////////////////////
 
-    uint256 public initialRewardPerDay = 6 * 10**18; // TODO: initialRewardPerAmount
+    uint256 public initialRewardPerAmount = 6 * 10**18;
     uint256 public BLOCKS_PER_DAY;
     uint256 public BLOCKS_PER_WEEK;
 
@@ -53,10 +54,11 @@ contract RewardV1 is Reward {
     }
 
     function _afterFeed(uint256 tokenId, uint256 amount) internal virtual override {
-        if (pendingReward[tokenId] == 0) {
+        if (isAvatarExist[tokenId] == false) {
+            isAvatarExist[tokenId] = true;
             avatarCount = avatarCount.add(1);
-            updatePhase();
         }
+        updatePhase();
         pendingReward[tokenId] = _estimateReward(tokenId, amount);
     }
 
@@ -67,6 +69,7 @@ contract RewardV1 is Reward {
         if (_numPhase > _blockPhase) {
             lastBlock = block.number;
             lastBlockPhase = _numPhase;
+            emit BlockPhaseUpdated(block.number, lastBlockPhase);
         }
     }
 
@@ -75,7 +78,7 @@ contract RewardV1 is Reward {
         if (phaseNum >= 1) {
             lastBlockPhase = lastBlockPhase.add(phaseNum);
             lastBlock = lastBlock.add(phaseNum * BLOCKS_PER_WEEK); // rather than lastBlock = block.number
-            emit BlockPhaseUpdated(lastBlockPhase);
+            emit BlockPhaseUpdated(lastBlock, lastBlockPhase);
         }
     }
 
@@ -134,7 +137,7 @@ contract RewardV1 is Reward {
     function _currReward(uint256 _currPhase) public view returns(uint256) {
         uint256 _base = 1*10**18;
         if (_currPhase < 4) {
-            return initialRewardPerDay.sub(_base.mul(_currPhase));
+            return initialRewardPerAmount.sub(_base.mul(_currPhase));
         } else if (_currPhase < 6) {
             return 2*10**18; // 2
         } else {
