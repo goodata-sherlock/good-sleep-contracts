@@ -64,6 +64,11 @@ export function handleTransfer(event: TransferEvent): void {
     transfer.from = event.params.from
     transfer.to = event.params.to
     transfer.token = genTokenID(event.address, event.params.tokenId)
+
+    transfer.block = event.block.number
+    transfer.tx = event.transaction.hash
+    transfer.time = event.block.timestamp
+
     transfer.save()
 }
 
@@ -78,6 +83,11 @@ export function handleTokenURIUpdated(event: TokenURIUpdatedEvent): void {
     let uri = tokenContract.tokenURI(event.params.tokenId)
     entity.token = genTokenID(event.address, event.params.tokenId)
     entity.uri = uri
+
+    entity.block = event.block.number
+    entity.tx = event.transaction.hash
+    entity.time = event.block.timestamp
+
     entity.save()
 
     let token = Token.load(genTokenID(event.address, event.params.tokenId))
@@ -95,6 +105,11 @@ export function handleApproval(event: ApprovalEvent): void {
     entity.owner = event.params.owner
     entity.approved = event.params.approved
     entity.token = genTokenID(event.address, event.params.tokenId)
+
+    entity.block = event.block.number
+    entity.tx = event.transaction.hash
+    entity.time = event.block.timestamp
+
     entity.save()
 }
   
@@ -108,5 +123,10 @@ export function handleApprovalForAll(event: ApprovalForAllEvent): void {
     entity.owner = event.params.owner
     entity.operator = event.params.operator
     entity.approved = event.params.approved
+
+    entity.block = event.block.number
+    entity.tx = event.transaction.hash
+    entity.time = event.block.timestamp
+
     entity.save()
 }
