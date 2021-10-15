@@ -129,7 +129,11 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
             let owner = await this.avatar.ownerOf(tokenId)
             let beforeBalance = await this.good.balanceOf(owner)
 
-            let withdrawReceipt = await this.reward.withdraw(tokenId, { from: owner })
+            let withdrawReceipt = await this.reward.withdraw(
+                tokenId,
+                await this.reward.reward(tokenId),
+                { from: owner }
+            )
             let withdrawalEventArgs = testUtils.getEventArgsFromTx(withdrawReceipt, 'Withdrawal')
             let afterBalance = await this.good.balanceOf(owner)
             assert.equal(
@@ -194,12 +198,23 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         assert.equal((await this.reward.avatarCount()).toString(), '1')
     })
 
-    // it('Backend feeds avatar out of max amount', async() => {
-    //     expectRevert(
-    //         this.reward.feed(aliceAvatarId, '7', { from: backend }),
-    //         'RewardV1: out of max amount'
-    //     )
-    // })
+    it('Withdrawal revert', async() => {
+        await expectRevert(
+            this.reward.withdraw(carolAvatarId, toWei('1'), { from: dev }),
+            'RewardV1: token owner is not you'
+        )
+
+        await expectRevert(
+            this.reward.withdraw(carolAvatarId, toWei('1'), { from: carol }),
+            'RewardV1: pending reward is not enough'
+        )
+
+        await expectRevert(
+            // amount 7 > pending reward 6
+            this.reward.withdraw(aliceAvatarId, toWei('7'), { from: alice }),
+            'RewardV1: pending reward is not enough'
+        )
+    })
 
     it('Phase', async() => {
         await this.expectPhase(0, 0, 0)
