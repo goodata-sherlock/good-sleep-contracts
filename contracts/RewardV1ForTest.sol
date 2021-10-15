@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./RewardV1Template.sol";
 
-contract RewardV1 is RewardV1Template {
+contract RewardV1ForTest is RewardV1Template {
     using SafeMath for uint256;
 
     uint256 public initialRewardPerAmount = 6 * 10**18;
@@ -18,26 +18,25 @@ contract RewardV1 is RewardV1Template {
     }
 
     function blocksPerPhase() public override pure returns(uint256) {
-        // BLOCKS_PER_PHASE = 7 * BLOCKS_PER_DAY
-        return 7 * (24 * 60 * 60 / 3);
+        return 28;
     }
 
     function avatarNumPhase(uint256 avatarNum) public override pure returns(uint256) {
-        if (avatarNum <= 5000) {
+        if (avatarNum <= 3) {
             return 0;
-        } else if (avatarNum <= 15000) {
+        } else if (avatarNum <= 4) {
             return 1;
-        } else if (avatarNum <= 30000) {
+        } else if (avatarNum <= 5) {
             return 2;
-        } else if (avatarNum <= 50000) {
+        } else if (avatarNum <= 6) {
             return 3;
-        } else if (avatarNum <= 100000) {
+        } else if (avatarNum <= 7) {
             return 4;
-        } else if (avatarNum <= 200000) {
+        } else if (avatarNum <= 8) {
             return 5;
-        } else if (avatarNum <= 350000) {
+        } else if (avatarNum <= 9) {
             return 6;
-        } else { // <= 500000
+        } else { // <= 10
             return maxPhse(); // 7
         }
     }
