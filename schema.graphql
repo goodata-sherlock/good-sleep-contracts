@@ -22,6 +22,10 @@ type Approval @entity {
   owner: Bytes! # address
   approved: Bytes! # address
   token: Token!
+
+  block: BigInt!
+  tx: Bytes!
+  time: BigInt!
 }
 
 type ApprovalForAll @entity {
@@ -29,12 +33,20 @@ type ApprovalForAll @entity {
   owner: Bytes! # address
   operator: Bytes! # address
   approved: Boolean! # bool
+
+  block: BigInt!
+  tx: Bytes!
+  time: BigInt!
 }
 
 type TokenURIUpdated @entity {
   id: ID!
   uri: String! # string
   token: Token!
+
+  block: BigInt!
+  tx: Bytes!
+  time: BigInt!
 }
 
 type Transfer @entity {
@@ -42,6 +54,10 @@ type Transfer @entity {
   from: Bytes! # address
   to: Bytes! # address
   token: Token!
+
+  block: BigInt!
+  tx: Bytes!
+  time: BigInt!
 }
 
 type RewardRecord @entity {
@@ -56,6 +72,10 @@ type FeedRecord @entity {
   tokenId: BigInt! # uint256
   amount: BigInt! # uint256
   rewardRecord: RewardRecord!
+
+  block: BigInt!
+  tx: Bytes!
+  time: BigInt!
 }
 
 type RewardWithdrawal @entity {
@@ -63,12 +83,19 @@ type RewardWithdrawal @entity {
   tokenId: BigInt! # uint256
   to: Bytes! # address
   amount: BigInt! # uint256
-  time: BigInt! # uint256
   rewardRecord: RewardRecord!
+
+  block: BigInt!
+  tx: Bytes!
+  time: BigInt!
 }
 
 type MultiplierUpdated @entity {
   id: ID!
   oldMultiplier: BigInt! # uint256
   newMultiplier: BigInt! # uint256
+
+  block: BigInt!
+  tx: Bytes!
+  time: BigInt!
 }

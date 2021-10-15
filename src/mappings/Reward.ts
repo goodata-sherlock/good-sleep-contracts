@@ -23,6 +23,11 @@ export function handleFeeding(event: FeedingEvent): void {
     feedRecord.tokenId = event.params.tokenId
     feedRecord.amount = event.params.amount
     feedRecord.rewardRecord = event.params.tokenId.toHex()
+
+    feedRecord.block = event.block.number
+    feedRecord.tx = event.transaction.hash
+    feedRecord.time = event.block.timestamp
+
     feedRecord.save()
 
     if (RewardRecord.load(feedRecord.rewardRecord) == null) {
@@ -41,6 +46,11 @@ export function handleMultiplierUpdated(event: MultiplierUpdatedEvent): void {
 
     entity.oldMultiplier = event.params.oldMultiplier
     entity.newMultiplier = event.params.newMultiplier
+
+    entity.block = event.block.number
+    entity.tx = event.transaction.hash
+    entity.time = event.block.timestamp
+
     entity.save()
 }
 
@@ -54,6 +64,11 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     entity.amount = event.params.amount
     entity.time = event.block.timestamp
     entity.rewardRecord = event.params.tokenId.toHex()
+
+    entity.block = event.block.number
+    entity.tx = event.transaction.hash
+    entity.time = event.block.timestamp
+
     entity.save()
 
     let rewardRecord = RewardRecord.load(event.params.tokenId.toHex()) as RewardRecord
