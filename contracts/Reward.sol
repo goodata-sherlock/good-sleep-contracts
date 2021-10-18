@@ -84,15 +84,14 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         emit MultiplierUpdated(oldMultiplier, _multiplier);
     }
 
-    function withdraw(uint256 tokenId) public override returns(uint256) {
-        (address addr, uint256 amount) = _withdraw(tokenId);
+    function withdraw(uint256 tokenId, uint256 amount) public override {
+        address addr = _withdraw(tokenId, amount);
         emit Withdrawal(tokenId, addr, amount);
-        return amount;
     }
 
-    function _withdraw(uint256 tokenId) internal virtual returns(address, uint256) {
+    function _withdraw(uint256 tokenId, uint256 amount) internal virtual returns(address) {
         lastRewardRecords[tokenId] = records[tokenId];
-        return (address(0), 0);
+        return address(0);
     }
 
     function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {

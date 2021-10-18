@@ -23,5 +23,5 @@ interface IReward {
     function estimateReward(uint256 tokenId, uint256 amount) external view returns(uint256);
     function multiplier() external view returns(uint256);
     function setMultiplier(uint256 _multiplier) external;
-    function withdraw(uint256 tokenId) external returns(uint256);
+    function withdraw(uint256 tokenId, uint256 amount) external;
 }

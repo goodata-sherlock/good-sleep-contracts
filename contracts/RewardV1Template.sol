@@ -145,14 +145,16 @@ contract RewardV1Template is Reward {
         return _oldReward.add(amount.mul(currReward()).mul(multiplier).div(10**18));
     }
 
-    function _withdraw(uint256 tokenId) internal virtual override returns(address, uint256) {
-        uint256 amount = _reward(tokenId);
-        require(amount > 0, "RewardV1: pending reward is zero");
+    function _withdraw(uint256 tokenId, uint256 amount) internal override virtual returns(address) {
         address tokenOwner = avatar.ownerOf(tokenId);
         require(tokenOwner == _msgSender(), "RewardV1: token owner is not you");
+
+        uint256 pending = _reward(tokenId);
+        require(pending >= amount, "RewardV1: pending reward is not enough");
         pendingReward[tokenId] = pendingReward[tokenId].sub(amount);
+
         good.transfer(tokenOwner, amount);
         lastRewardRecords[tokenId] = records[tokenId];
-        return (tokenOwner, amount);
+        return tokenOwner;
     }
 }
