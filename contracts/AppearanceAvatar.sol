@@ -9,7 +9,7 @@ contract AppearanceAvatar is Avatar, Ownable {
         Avatar("Good Appearance Avatar Collection", "GAA", trustedForwarder) {}
 
     function _baseURI() internal view virtual override(Avatar) returns (string memory) {
-        return "https://goodata.io/metadata/appearance/";
+        return "https://sleep.goodata.io/metadata/avatar/";
     }
 
     function _mint(address to, uint256 tokenId) internal onlyOwner override virtual {
