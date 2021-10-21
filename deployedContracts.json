@@ -8,11 +8,11 @@
     "startBlock": 7676284
   },
   "bsctestnet": {
-    "good": "0xAcbCdF001E04163cFCE13eE9252A0E3a0899Cf8B",
-    "metaTx": "0xBC93cE2bb42d76E8164C736f1A544E5F76550C12",
-    "sleepAvatar": "0x340A3e3A643dDb4cD532930e26e3B12430AD25dE",
-    "appearanceAvatar": "0x2BB8Ff369F284698BC0642a10488024e56937bea",
-    "rewardV1": "0x505D76a197B91789735C219cBE0B0aE8C74dB734",
-    "startBlock": 13410468
+    "good": "0x3fCb987E9500982993B132A8100Db2807C7cf918",
+    "metaTx": "0x2c9eC9d916D056D209bCbc9578165a6eFc614b05",
+    "sleepAvatar": "0xbD12fa08658D878D6Da19600b89c2C69a8cC5F4B",
+    "appearanceAvatar": "0x5e5a9D551c2696DE52a4C92683C5c8018347049b",
+    "rewardV1": "0x32868C09DfEf6f51a74cE79D4C117B23bcfA5dB8",
+    "startBlock": 13411357
   }
 }
