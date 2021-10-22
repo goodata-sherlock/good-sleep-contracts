@@ -2,10 +2,12 @@
   "scripts": {
     "create": "graph create data-graph --node https://api.thegraph.com/deploy/",
     "create-local": "graph create data-graph --node http://127.0.0.1:8020",
+    "create-gdtestnet": "graph create data-graph --node http://10.100.19.112:8020",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy data-graph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy data-graph --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy-local": "graph deploy data-graph --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
+    "deploy-gdtestnet": "graph deploy data-graph --ipfs http://10.100.129.225:5001 --node http://10.100.19.112:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.20.1",

@@ -8,6 +8,6 @@ contract SleepAvatar is Avatar {
         Avatar("Good Sleep Avatar Collection", "GSA", trustedForwarder) {}
 
     function _baseURI() internal view virtual override(Avatar) returns (string memory) {
-        return "https://goodata.io/metadata/sleepdata/";
+        return "https://sleep.goodata.io/metadata/data/sleep/";
     }
 }

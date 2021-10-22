@@ -14,7 +14,7 @@ const {
 } = require("ethereumjs-util");
 
 const SleepAvatar = artifacts.require('SleepAvatar')
-const Reward = artifacts.require('RewardV1')
+const Reward = artifacts.require('RewardV1ForTest')
 const MetaTx = artifacts.require('MetaTx')
 const MockGooD = artifacts.require('MockGooD')
 
@@ -60,7 +60,6 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         this.good = await MockGooD.new({ from: dev })
 
         this.reward = await Reward.new(
-            BLOCKS_PER_DAY,
             this.avatar.address,
             this.good.address,
             this.metaTx.address,
@@ -85,7 +84,7 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
             assert.equal(phase, expectPhase, 'unexpected phase')
         }
 
-        this.expectFeed = async (tokenId, amount, isBlockPhaseUpdated, expectPhase) => {
+        this.expectFeed = async (tokenId, amount, isCheckBlockPhaseUpdated, expectPhase) => {
             let feedReceipt = await this.reward.feed(tokenId, amount, { from: backend })
             const feedEventArgs = testUtils.getEventArgsFromTx(feedReceipt, 'Feeding')
             assert.equal(
@@ -100,10 +99,27 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
                 'unexpected feeding amount'
             )
 
-            if (isBlockPhaseUpdated) {
+            if (isCheckBlockPhaseUpdated) {
                 const phaseUpdated = testUtils.getEventArgsFromTx(feedReceipt, 'BlockPhaseUpdated')
                 assert.notEqual(phaseUpdated, null, 'no phase update')
                 assert.equal(phaseUpdated.phase, expectPhase, 'wrong phase after feeding')
+            }
+        }
+
+        this.addAvatarNum = async (count) => {
+            for (let i = 1; i <= count; i++) {
+                let oldAvatarNum = await this.reward.avatarCount()
+                let createAvatarReceipt = await this.avatar.createAvatar({ from: dev })
+                const transferEventArgs = testUtils.getEventArgsFromTx(createAvatarReceipt, 'Transfer')
+                let tokenId = transferEventArgs.tokenId
+                await this.expectFeed(tokenId, '1', false)
+                let newAvatarNum = await this.reward.avatarCount()
+                
+                assert.equal(
+                    newAvatarNum.toString(),
+                    oldAvatarNum.add(new BN(1)).toString(),
+                    'unexpected avatar count'
+                )
             }
         }
 
@@ -113,7 +129,11 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
             let owner = await this.avatar.ownerOf(tokenId)
             let beforeBalance = await this.good.balanceOf(owner)
 
-            let withdrawReceipt = await this.reward.withdraw(tokenId, { from: owner })
+            let withdrawReceipt = await this.reward.withdraw(
+                tokenId,
+                await this.reward.reward(tokenId),
+                { from: owner }
+            )
             let withdrawalEventArgs = testUtils.getEventArgsFromTx(withdrawReceipt, 'Withdrawal')
             let afterBalance = await this.good.balanceOf(owner)
             assert.equal(
@@ -178,12 +198,23 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         assert.equal((await this.reward.avatarCount()).toString(), '1')
     })
 
-    // it('Backend feeds avatar out of max amount', async() => {
-    //     expectRevert(
-    //         this.reward.feed(aliceAvatarId, '7', { from: backend }),
-    //         'RewardV1: out of max amount'
-    //     )
-    // })
+    it('Withdrawal revert', async() => {
+        await expectRevert(
+            this.reward.withdraw(carolAvatarId, toWei('1'), { from: dev }),
+            'RewardV1: token owner is not you'
+        )
+
+        await expectRevert(
+            this.reward.withdraw(carolAvatarId, toWei('1'), { from: carol }),
+            'RewardV1: pending reward is not enough'
+        )
+
+        await expectRevert(
+            // amount 7 > pending reward 6
+            this.reward.withdraw(aliceAvatarId, toWei('7'), { from: alice }),
+            'RewardV1: pending reward is not enough'
+        )
+    })
 
     it('Phase', async() => {
         await this.expectPhase(0, 0, 0)
@@ -238,6 +269,22 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
         await this.expectWithdraw(aliceAvatarId, toWei('21'), toWei('21'), '0')
         await this.expectFeed(carolAvatarId, '7')
         await this.expectWithdraw(carolAvatarId, toWei('21'), toWei('21'), '0')
+
+        // switch to avatarNumPhase 1 by increasing avatar count
+        await this.addAvatarNum(2)
+        await this.expectPhase(1, 3, 3)
+
+        // switch to avatarNumPhase 4 by increasing avatar count
+        await this.addAvatarNum(3)
+        // blockPhase was forcibly switched to 4 when avatarNumPhase > old blockPhase
+        await this.expectPhase(4, 4, 4)
+
+        assert.equal(await this.reward.currReward(), toWei('2'))
+        
+        // switch to avatarNumPhase 4 by increasing avatar count
+        await this.addAvatarNum(4)
+        // reach max phase 7
+        await this.expectPhase(7, 7, 7)
     })
 
     it('Feed avatars without power', async() => {

@@ -33,8 +33,8 @@ abstract contract Avatar is ERC2771Context, ERC721, ERC721URIStorage, ERC721Burn
 
     function createAvatar(address to, bytes memory _data) internal virtual {
         uint256 tokenId = _getNextTokenId();
-        _safeMint(to, tokenId, _data);
         _incrementTokenId();
+        _safeMint(to, tokenId, _data);
         setTokenURI(tokenId, tokenId.toString());
     }
 
@@ -66,8 +66,7 @@ abstract contract Avatar is ERC2771Context, ERC721, ERC721URIStorage, ERC721Burn
      * Emits a {Transfer} event.
      */
     function safeMint() public virtual override {
-        _safeMint(_msgSender(), _getNextTokenId(), "");
-        _incrementTokenId();
+        safeMint("");
     }
 
     /**
@@ -75,8 +74,9 @@ abstract contract Avatar is ERC2771Context, ERC721, ERC721URIStorage, ERC721Burn
      * forwarded in {IERC721Receiver-onERC721Received} to contract recipients.
      */
     function safeMint(bytes memory _data) internal virtual {
-        _safeMint(_msgSender(), _getNextTokenId(), _data);
+        uint256 tokenId = _getNextTokenId();
         _incrementTokenId();
+        _safeMint(_msgSender(), tokenId, _data);
     }
 
     function burn(uint256 tokenId) public virtual override(ERC721Burnable, IAvatar) {
