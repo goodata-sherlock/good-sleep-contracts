@@ -41,4 +41,19 @@ contract('SleepAvatar', ([alice, bob, carol, dev, backend]) => {
         assert.equal(carolAvatarId.toString(), '3')
         assert.equal(await this.avatar.ownerOf(carolAvatarId), carol)
     })
+
+    it('Create an new avatar to a user', async() => {
+        let createAvatarReceipt = await this.avatar.createAvatarTo(backend)
+        const transferEventArgs = testUtils.getEventArgsFromTx(createAvatarReceipt, 'Transfer')
+        let tokenId = transferEventArgs.tokenId
+        assert.equal(tokenId.toString(), '4')
+        assert.equal(await this.avatar.ownerOf(tokenId), backend)
+    })
+
+    it('Token URI', async() => {
+        for (let i = 1; i <= 4; i++) {
+            let uri = await this.avatar.tokenURI(i)
+            assert.equal(uri, 'https://sleep.goodata.io/metadata/data/sleep/' + i)
+        }
+    })
 })
