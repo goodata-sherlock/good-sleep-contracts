@@ -17,7 +17,7 @@ contract RewardV1ForTest is RewardV1Template {
         return 7;
     }
 
-    function blocksPerPhase() public override pure returns(uint256) {
+    function blocksOfCurrPhase() public override view returns(uint256) {
         return 28;
     }
 

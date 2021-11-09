@@ -17,7 +17,7 @@ contract RewardV1 is RewardV1Template {
         return 7;
     }
 
-    function blocksPerPhase() public override pure returns(uint256) {
+    function blocksOfCurrPhase() public override view returns(uint256) {
         // BLOCKS_PER_PHASE = 7 * BLOCKS_PER_DAY
         return 7 * (24 * 60 * 60 / 3);
     }
