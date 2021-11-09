@@ -35,7 +35,7 @@ abstract contract Avatar is ERC2771Context, ERC721, ERC721URIStorage, ERC721Burn
         uint256 tokenId = _getNextTokenId();
         _incrementTokenId();
         _safeMint(to, tokenId, _data);
-        setTokenURI(tokenId, tokenId.toString());
+        _setTokenURI(tokenId, tokenId.toString());
     }
 
     function _baseURI() internal view virtual override(ERC721) returns (string memory) {
@@ -50,11 +50,15 @@ abstract contract Avatar is ERC2771Context, ERC721, ERC721URIStorage, ERC721Burn
     }
 
     function setTokenURI(uint256 tokenId, string memory uri) public virtual override {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "Avatar: no power");
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "Avatar: not owner or not be approved");
         _setTokenURI(tokenId, uri);
+    }
+
+    function _setTokenURI(uint256 tokenId, string memory uri) internal virtual override {
+        super._setTokenURI(tokenId, uri);
         emit TokenURIUpdated(tokenId, uri);
     }
-    
+
     /**
      * @dev Safely mints `nextTokenId` and transfers it to `to`.
      *
