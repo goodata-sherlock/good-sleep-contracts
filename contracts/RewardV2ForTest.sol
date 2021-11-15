@@ -38,7 +38,7 @@ contract RewardV2ForTest is RewardV1Template {
         return blocksGivenPhase(lastBlockPhase);
     }
 
-    function blocksGivenPhase(uint256 _phase) public pure returns(uint256) {
+    function blocksGivenPhase(uint256 _phase) public override pure returns(uint256) {
         if (_phase == 0) {
             return  BLOCKS_PER_DAY.mul(3);
         } else if (_phase == 1) {

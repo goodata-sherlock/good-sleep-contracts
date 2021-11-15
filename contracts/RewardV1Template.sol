@@ -70,8 +70,10 @@ contract RewardV1Template is Reward {
     function updateBlockPhase() internal {
         uint256 phaseNum = increasedBlockPhaseNum();
         if (phaseNum >= 1) {
+            for (uint256 i = 0; i < phaseNum; i++) {
+                lastBlock = lastBlock.add(blocksGivenPhase(lastBlockPhase.add(i))); // rather than lastBlock = block.number
+            }
             lastBlockPhase = lastBlockPhase.add(phaseNum);
-            lastBlock = lastBlock.add(phaseNum * blocksOfCurrPhase()); // rather than lastBlock = block.number
             emit BlockPhaseUpdated(lastBlock, lastBlockPhase);
         }
     }
@@ -105,9 +107,14 @@ contract RewardV1Template is Reward {
     }
 
     function increasedBlockPhaseNum() public view returns(uint256) {
-        uint256 phaseNum = (block.number.sub(lastBlock)).div(blocksOfCurrPhase());
-        phaseNum = phaseNum.add(lastBlockPhase) <= maxPhse()? phaseNum: 0;
-        return phaseNum;
+        uint256 duration = block.number.sub(lastBlock);
+        uint256 curr = lastBlockPhase;
+        while (duration > 0 && duration >= blocksGivenPhase(curr)) {
+            duration = duration.sub(blocksGivenPhase(curr));
+            curr = curr.add(1);
+        }
+        
+        return curr <= maxPhse()? curr.sub(lastBlockPhase) : 0;
     }
 
     function blockPhase() public virtual view returns(uint256) {
@@ -118,6 +125,10 @@ contract RewardV1Template is Reward {
     * @dev need to implement in child contract.
      */
     function blocksOfCurrPhase() public virtual view returns(uint256) {
+        return blocksGivenPhase(0);
+    }
+
+    function blocksGivenPhase(uint256 _phase) public virtual pure returns(uint256) {
         return 10000;
     }
 

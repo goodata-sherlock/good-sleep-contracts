@@ -221,7 +221,9 @@ contract('RewardV2', ([alice, bob, carol, dev, backend]) => {
         assert.equal(await this.reward.currReward(), toWei('6'))
         await this.expectWithdraw(aliceAvatarId, toWei('1'), toWei('1'), '0')
 
-        console.log('startBlock: ', (await this.reward.startBlock()).toString())
+        await time.advanceBlockTo('18') // 7 + 11
+        await this.expectPhase(0, 0, 0)
+
         await time.advanceBlockTo('19') // 7 + 12
         await this.expectPhase(0, 1, 1)
         assert.equal(await this.reward.currReward(), toWei('5'))
@@ -229,11 +231,20 @@ contract('RewardV2', ([alice, bob, carol, dev, backend]) => {
         await time.advanceBlockTo('35') // 19 + 16
         await this.expectPhase(0, 2, 2)
         assert.equal(await this.reward.currReward(), toWei('4'))
+        
+        await this.expectFeed(bobAvatarId, toWei('20'), false)
+        assert.equal((await this.reward.avatarCount()).toString(), '2')
+        await this.expectPhase(1, 2, 2)
+        await this.expectWithdraw(bobAvatarId, toWei('20'), toWei('20'), '0')
 
-        console.log('estimateReward: ', this.reward.estimateReward(bobAvatarId, '0'))
-        // await this.expectFeed(bobAvatarId, toWei('1'), false)
-        // assert.equal((await this.reward.avatarCount()).toString(), '1')
-        // await this.expectPhase(1, 2, 2)
-        // await this.expectWithdraw(bobAvatarId, toWei('1'), toWei('1'), '0')
+        await this.avatar.createAvatar({ from: dev })
+        await this.expectFeed('4', toWei('20'), false)
+        assert.equal((await this.reward.avatarCount()).toString(), '3')
+        await this.expectPhase(2, 2, 2)
+        await this.expectWithdraw('4', toWei('20'), toWei('20'), '0')
+
+        await this.expectFeed(carolAvatarId, toWei('50'), false)
+        assert.equal((await this.reward.avatarCount()).toString(), '4')
+        await this.expectPhase(3, 3, 3)
     })
 })
