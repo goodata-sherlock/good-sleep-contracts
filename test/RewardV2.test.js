@@ -14,7 +14,7 @@ const {
 } = require("ethereumjs-util");
 
 const SleepAvatar = artifacts.require('SleepAvatar')
-const Reward = artifacts.require('RewardV2')
+const Reward = artifacts.require('RewardV2ForTest')
 const MetaTx = artifacts.require('MetaTx')
 const MockGooD = artifacts.require('MockGooD')
 
@@ -43,7 +43,7 @@ const MetaTxTypes = {
 const BLOCKS_PER_DAY = 4 // 24 * 60 * 60 / 3
 const BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY
 
-contract('Reward', ([alice, bob, carol, dev, backend]) => {
+contract('RewardV2', ([alice, bob, carol, dev, backend]) => {
     let rewardContract
     let metaTxContract
     before(async () => {
@@ -218,7 +218,22 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
 
     it('Phase', async() => {
         await this.expectPhase(0, 0, 0)
-        assert.equal(await this.reward.currReward(), toWei('20'))
+        assert.equal(await this.reward.currReward(), toWei('6'))
         await this.expectWithdraw(aliceAvatarId, toWei('1'), toWei('1'), '0')
+
+        console.log('startBlock: ', (await this.reward.startBlock()).toString())
+        await time.advanceBlockTo('19') // 7 + 12
+        await this.expectPhase(0, 1, 1)
+        assert.equal(await this.reward.currReward(), toWei('5'))
+
+        await time.advanceBlockTo('35') // 19 + 16
+        await this.expectPhase(0, 2, 2)
+        assert.equal(await this.reward.currReward(), toWei('4'))
+
+        console.log('estimateReward: ', this.reward.estimateReward(bobAvatarId, '0'))
+        // await this.expectFeed(bobAvatarId, toWei('1'), false)
+        // assert.equal((await this.reward.avatarCount()).toString(), '1')
+        // await this.expectPhase(1, 2, 2)
+        // await this.expectWithdraw(bobAvatarId, toWei('1'), toWei('1'), '0')
     })
 })

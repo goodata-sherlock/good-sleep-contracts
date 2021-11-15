@@ -1,3 +1,4 @@
+/*
 const { assert } = require("chai")
 const testUtils = require('./utils')
 
@@ -382,3 +383,4 @@ const signTypedData = (wallet, typedData) => {
         },
     )
 }
+*/
