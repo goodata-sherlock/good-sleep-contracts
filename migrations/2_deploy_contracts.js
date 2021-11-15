@@ -98,5 +98,5 @@ const deployContractsInTestnet = async (deployer) => {
         await appearanceAvatar.createAvatar()
     }
 
-    await rewardV1.withdraw('2', toWei('1'))
+    // await rewardV1.withdraw('2', toWei('1'))
 }
