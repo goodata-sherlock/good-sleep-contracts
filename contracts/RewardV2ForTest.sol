@@ -16,7 +16,7 @@ contract RewardV2ForTest is RewardV1Template {
         RewardV1Template(_avatar, _good, trustedForwarder) {
     }
 
-    function maxPhse() public override pure returns(uint256) {
+    function maxPhase() public override pure returns(uint256) {
         return 4;
     }
 
@@ -30,7 +30,7 @@ contract RewardV2ForTest is RewardV1Template {
         } else if (avatarNum <= 4) { // 4
             return 3;
         } else { // 5
-            return maxPhse(); // 4
+            return maxPhase(); // 4
         }
     }
 

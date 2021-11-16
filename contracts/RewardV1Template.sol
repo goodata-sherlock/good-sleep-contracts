@@ -3,28 +3,24 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./DynamicBlockPhase.sol";
 import "./Reward.sol";
 import "./Avatar.sol";
 
-contract RewardV1Template is Reward {
+abstract contract RewardV1Template is Reward, DynamicBlockPhase {
     using SafeMath for uint256;
-
-    event BlockPhaseUpdated(uint256 lastBlock, uint256 phase);
 
     Avatar avatar;
     uint256 public avatarCount;
     ERC20 good;
     mapping(uint256 => uint256) pendingReward;
     mapping(uint256 => bool) isAvatarExist;
-    uint256 public startBlock;
 
     //////////////////////////////////////////////////////////
-    // updated when                                         //
+    // lastBlock & lastBlockPhase updated when              //
     // avatarNumPhase > blockPhase                          //
     // or                                                   //
-    // (currBlock - lastBlock) / BLOCKS_PER_PHASE >= 1      //
-    uint256 public lastBlock;                               //
-    uint256 public lastBlockPhase;                          //
+    // increasedBlockPhase >= 1                             //
     //////////////////////////////////////////////////////////
 
     constructor(address _avatar, address _good, address trustedForwarder) Reward(trustedForwarder) {
@@ -67,17 +63,6 @@ contract RewardV1Template is Reward {
         }
     }
 
-    function updateBlockPhase() internal {
-        uint256 phaseNum = increasedBlockPhaseNum();
-        if (phaseNum >= 1) {
-            for (uint256 i = 0; i < phaseNum; i++) {
-                lastBlock = lastBlock.add(blocksGivenPhase(lastBlockPhase.add(i))); // rather than lastBlock = block.number
-            }
-            lastBlockPhase = lastBlockPhase.add(phaseNum);
-            emit BlockPhaseUpdated(lastBlock, lastBlockPhase);
-        }
-    }
-
     /** 
     * @dev Increase phase when the number of avatar exceeds range or
     *      time exceeds 1 week in that phase
@@ -93,55 +78,27 @@ contract RewardV1Template is Reward {
     }
 
     /**
-    * @dev need to implement in child contract.
+     * @dev need to implement in child contract.
      */
-    function maxPhse() public virtual pure returns(uint256) {
-        return 7;
+    function maxPhase() public virtual pure returns(uint256);
+
+    function maxBlockPhase() public override virtual pure returns(uint256) {
+        return maxPhase();
     }
 
     /**
-    * @dev need to implement in child contract.
+     * @dev need to implement in child contract.
      */
-    function avatarNumPhase(uint256 avatarNum) public virtual pure returns(uint256) {
-        return 0;
-    }
-
-    function increasedBlockPhaseNum() public view returns(uint256) {
-        uint256 duration = block.number.sub(lastBlock);
-        uint256 curr = lastBlockPhase;
-        while (duration > 0 && duration >= blocksGivenPhase(curr)) {
-            duration = duration.sub(blocksGivenPhase(curr));
-            curr = curr.add(1);
-        }
-        
-        return curr <= maxPhse()? curr.sub(lastBlockPhase) : 0;
-    }
-
-    function blockPhase() public virtual view returns(uint256) {
-        return lastBlockPhase.add(increasedBlockPhaseNum());
-    }
-
-    /**
-    * @dev need to implement in child contract.
-     */
-    function blocksOfCurrPhase() public virtual view returns(uint256) {
-        return blocksGivenPhase(0);
-    }
-
-    function blocksGivenPhase(uint256 _phase) public virtual pure returns(uint256) {
-        return 10000;
-    }
+    function avatarNumPhase(uint256 avatarNum) public virtual pure returns(uint256);
 
     function currReward() public view returns(uint256) {
         return _currReward(_phase());
     }
 
     /**
-    * @dev need to implement in child contract.
+     * @dev need to implement in child contract.
      */
-    function _currReward(uint256 _currPhase) public virtual view returns(uint256) {
-        return 1*10**18;
-    }
+    function _currReward(uint256 _currPhase) public virtual view returns(uint256);
 
     function _reward(uint256 tokenId) internal virtual override view returns(uint256) {
         return pendingReward[tokenId];
