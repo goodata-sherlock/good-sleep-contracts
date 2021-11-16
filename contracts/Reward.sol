@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "./IReward.sol";
+import "./interfaces/IReward.sol";
 
 // MUST inherit ERC2771Context for supporting meta tx.
 abstract contract Reward is IReward, Ownable, ERC2771Context {
