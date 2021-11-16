@@ -1,4 +1,3 @@
-/*
 const { assert } = require("chai")
 const testUtils = require('./utils')
 
@@ -15,7 +14,7 @@ const {
 } = require("ethereumjs-util");
 
 const SleepAvatar = artifacts.require('SleepAvatar')
-const Reward = artifacts.require('RewardV1ForTest')
+const Reward = artifacts.require('RewardV1Mock')
 const MetaTx = artifacts.require('MetaTx')
 const MockGooD = artifacts.require('MockGooD')
 
@@ -44,7 +43,7 @@ const MetaTxTypes = {
 const BLOCKS_PER_DAY = 4 // 24 * 60 * 60 / 3
 const BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY
 
-contract('Reward', ([alice, bob, carol, dev, backend]) => {
+contract('RewardV2', ([alice, bob, carol, dev, backend]) => {
     let rewardContract
     let metaTxContract
     before(async () => {
@@ -84,7 +83,7 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
 
             assert.equal(phase, expectPhase, 'unexpected phase')
         }
-
+        
         this.expectFeed = async (tokenId, amount, isCheckBlockPhaseUpdated, expectPhase) => {
             let feedReceipt = await this.reward.feed(tokenId, amount, { from: backend })
             const feedEventArgs = testUtils.getEventArgsFromTx(feedReceipt, 'Feeding')
@@ -195,7 +194,7 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     })
 
     it('Backend feeds avatars', async() => {
-        await this.expectFeed(aliceAvatarId, '1', false)
+        await this.expectFeed(aliceAvatarId, toWei('1'), false)
         assert.equal((await this.reward.avatarCount()).toString(), '1')
     })
 
@@ -220,167 +219,32 @@ contract('Reward', ([alice, bob, carol, dev, backend]) => {
     it('Phase', async() => {
         await this.expectPhase(0, 0, 0)
         assert.equal(await this.reward.currReward(), toWei('6'))
-        await this.expectWithdraw(aliceAvatarId, toWei('6'), toWei('6'), '0')
+        await this.expectWithdraw(aliceAvatarId, toWei('1'), toWei('1'), '0')
 
-        await this.expectFeed(aliceAvatarId, '6', false)
-        assert.equal((await this.reward.avatarCount()).toString(), '1', 'avatarCount shoud still be 1')
-
-        await this.expectWithdraw(aliceAvatarId, toWei('36'), toWei('36'), '0')
-
-        // start block => 7
-        await time.advanceBlockTo('34')
+        await time.advanceBlockTo('18') // 7 + 11
         await this.expectPhase(0, 0, 0)
 
-        // switch to phase 1 by increasing block number
-        await time.advanceBlockTo('35') // 7 + 28
+        await time.advanceBlockTo('19') // 7 + 12
         await this.expectPhase(0, 1, 1)
         assert.equal(await this.reward.currReward(), toWei('5'))
-        await this.expectFeed(aliceAvatarId, '7', true, 1)
-        assert.equal(await this.reward.lastBlock(), '35')
-        assert.equal((await this.reward.increasedBlockPhaseNum()).toString(), '0')
-        await this.expectWithdraw(aliceAvatarId, toWei('35'), toWei('35'), '0')
 
-        await this.expectFeed(carolAvatarId, '7', false)
-        assert.equal((
-            await this.reward.avatarCount()).toString(),
-            '2',
-            'avatarCount should be 2 when firstly feed carcolAvatar'
-        )
-        await this.expectWithdraw(carolAvatarId, toWei('35'), toWei('35'), '0')
-
-        // switch to phase 3 by increasing block number
-        await time.advanceBlockTo('91') // 7 + 28*3
-        assert.equal(await this.reward.lastBlock(), '35', 'lastBlock of reward contract should be not updated')
-        assert.equal(
-            (await this.reward.lastBlockPhase()).toString(),
-            '1',
-            'lastBlockPhase should be 1'
-        )
-        assert.equal(
-            (await this.reward.increasedBlockPhaseNum()).toString(),
-            '2',
-            'increasedBlockPhaseNum should be 2'
-        )
-
-        await this.expectPhase(0, 3, 3)
-        assert.equal(await this.reward.currReward(), toWei('3'))
-        await this.expectFeed(aliceAvatarId, '7', true, 3)
-        assert.equal(await this.reward.lastBlock(), '91', 'lastBlock should be the start block of phase 3')
-
-        await this.expectWithdraw(aliceAvatarId, toWei('21'), toWei('21'), '0')
-        await this.expectFeed(carolAvatarId, '7')
-        await this.expectWithdraw(carolAvatarId, toWei('21'), toWei('21'), '0')
-
-        // switch to avatarNumPhase 1 by increasing avatar count
-        await this.addAvatarNum(2)
-        await this.expectPhase(1, 3, 3)
-
-        // switch to avatarNumPhase 4 by increasing avatar count
-        await this.addAvatarNum(3)
-        // blockPhase was forcibly switched to 4 when avatarNumPhase > old blockPhase
-        await this.expectPhase(4, 4, 4)
-
-        assert.equal(await this.reward.currReward(), toWei('2'))
+        await time.advanceBlockTo('35') // 19 + 16
+        await this.expectPhase(0, 2, 2)
+        assert.equal(await this.reward.currReward(), toWei('4'))
         
-        // switch to avatarNumPhase 4 by increasing avatar count
-        await this.addAvatarNum(4)
-        // reach max phase 7
-        await this.expectPhase(7, 7, 7)
-    })
+        await this.expectFeed(bobAvatarId, toWei('20'), false)
+        assert.equal((await this.reward.avatarCount()).toString(), '2')
+        await this.expectPhase(1, 2, 2)
+        await this.expectWithdraw(bobAvatarId, toWei('20'), toWei('20'), '0')
 
-    it('Feed avatars without power', async() => {
-        await expectRevert(
-            this.reward.feed(bobAvatarId, '1', { from: bob }),
-            'Ownable: caller is not the owner'
-        )
-    })
+        await this.avatar.createAvatar({ from: dev })
+        await this.expectFeed('4', toWei('20'), false)
+        assert.equal((await this.reward.avatarCount()).toString(), '3')
+        await this.expectPhase(2, 2, 2)
+        await this.expectWithdraw('4', toWei('20'), toWei('20'), '0')
 
-    // It must be the last one case.
-    it('Bob delegates backend to feed avatars', async() => {
-        let oldBackend = backend
-        let wallet = Wallet.generate()
-        backend = web3.utils.toChecksumAddress(wallet.getAddressString())
-        await this.reward.transferOwnership(backend, { from: oldBackend })
-        assert.equal((await this.reward.records(bobAvatarId)).toString(), '0')
-
-        let feedMethod = rewardContract.methods.feed(bobAvatarId, '1')
-        let [returndata, receipt] = await mustExecuteMetaTx(wallet, bob, metaTxContract, feedMethod, this.reward.address, '0', this.domain)
-        console.log('returndata: ', returndata)
-        console.log('receipt: ', receipt)
-        assert.equal((await this.reward.records(bobAvatarId)).toString(), '1')
-    })
-
-    it('test sign typed data', async() => {
-        // TODO: delete
-        domain = this.domain
-        req = {
-            from: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
-            to: '0x11a449ed8eadacda0a290ad0ffee174fdf0b3f7a',
-            value: '0',
-            gas: '100000000',
-            nonce: Number(1),
-            data: '0xdddddd',
-        }
-        let typedData = getTypedMessage(
-            req,
-            domain,
-        )
-
-        let typedHash = await this.metaTx.digest(req)
-        console.log('--------- typedData: ', JSON.stringify(typedData))
-        console.log('--------- typedHash: ', typedHash)
-
-        let wallet = Wallet.fromPrivateKey(toBuffer('0x9a01f5c57e377e0239e6036b7b2d700454b760b2dab51390f1eeb2f64fe98b68'))
-        let sig = signTypedData(
-            wallet,
-            typedData,
-        )
-        console.log('--------- expectSig: ', sig)
-        console.log('--------- sig      : ', ethSigUtil.personalSign(wallet.getPrivateKey(), typedHash))
+        await this.expectFeed(carolAvatarId, toWei('50'), false)
+        assert.equal((await this.reward.avatarCount()).toString(), '4')
+        await this.expectPhase(3, 3, 3)
     })
 })
-
-const mustExecuteMetaTx = async (wallet, delegatorAddr,metaTxContract, method, to, value, domain) => {
-    let fromAddr = web3.utils.toChecksumAddress(wallet.getAddressString())
-    let gas = await method.estimateGas({ from: fromAddr })
-    let data = method.encodeABI()
-    let nonce = await web3.eth.getTransactionCount(fromAddr)
-
-    let req = {
-        from: fromAddr,
-        to: web3.utils.toChecksumAddress(to),
-        value: value,
-        gas: gas,
-        nonce: Number(nonce),
-        data: data,
-    }
-
-    let typedData = getTypedMessage(req, domain)
-    let signature = signTypedData(wallet, typedData)
-
-    let returnData = await metaTxContract.methods.mustExecute(req, signature).call({ from: delegatorAddr })
-    // NOTE: MUST estimateGas
-    let fnGas = await metaTxContract.methods.mustExecute(req, signature).estimateGas({ from: delegatorAddr })
-    let receipt = await metaTxContract.methods.mustExecute(req, signature).send({ from: delegatorAddr, gas: fnGas })
-
-    return [returnData, receipt]
-}
-
-const getTypedMessage = (req, domain) => {
-    return {
-        types: MetaTxTypes,
-        domain: domain,
-        primaryType: 'ForwardRequest',
-        message: req,
-    }
-}
-
-const signTypedData = (wallet, typedData) => {
-    return ethSigUtil.signTypedMessage(
-        wallet.getPrivateKey(),
-        {
-            data: typedData,
-        },
-    )
-}
-*/

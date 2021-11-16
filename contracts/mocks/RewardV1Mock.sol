@@ -2,13 +2,13 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./RewardV1Template.sol";
+import "../RewardV1Template.sol";
 
-contract RewardV2 is RewardV1Template {
+contract RewardV1Mock is RewardV1Template {
     using SafeMath for uint256;
 
-    uint256 public initialRewardPerAmount = 20 * 10**18;
-    uint256 public constant BLOCKS_PER_DAY = 24 * 60 * 60 / 3;
+    uint256 public initialRewardPerAmount = 6 * 10**18;
+    uint256 public constant BLOCKS_PER_DAY = 4;
     uint256 public constant BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY;
     uint256 public constant BLOCKS_PER_MONTH = 30 * BLOCKS_PER_DAY;
 
@@ -17,28 +17,20 @@ contract RewardV2 is RewardV1Template {
     }
 
     function maxPhase() public override pure returns(uint256) {
-        return 8;
+        return 4;
     }
 
     function avatarNumPhase(uint256 avatarNum) public override pure returns(uint256) {
-        if (avatarNum <= 1000) { // 1k
+        if (avatarNum <= 1) { // 1
             return 0;
-        } else if (avatarNum <= 5000) { // 5k
+        } else if (avatarNum <= 2) { // 2
             return 1;
-        } else if (avatarNum <= 15000) { // 15k
+        } else if (avatarNum <= 3) { // 3
             return 2;
-        } else if (avatarNum <= 30000) { // 30k
+        } else if (avatarNum <= 4) { // 4
             return 3;
-        } else if (avatarNum <= 50000) { // 50k
-            return 4;
-        } else if (avatarNum <= 100000) { // 100k
-            return 5;
-        } else if (avatarNum <= 200000) { // 200k
-            return 6;
-        } else if (avatarNum <= 350000) { // 350k
-            return 7;
-        } else { // 500k
-            return maxPhase(); // 8
+        } else { // 5
+            return maxPhase(); // 4
         }
     }
 
@@ -48,21 +40,15 @@ contract RewardV2 is RewardV1Template {
 
     function blocksGivenPhase(uint256 _phase) public override pure returns(uint256) {
         if (_phase == 0) {
-            return  BLOCKS_PER_DAY;
+            return  BLOCKS_PER_DAY.mul(3);
         } else if (_phase == 1) {
-            return BLOCKS_PER_WEEK;
+            return BLOCKS_PER_DAY.mul(4);
         } else if (_phase == 2) {
-            return BLOCKS_PER_WEEK.mul(2);
+            return BLOCKS_PER_DAY.mul(5);
         } else if (_phase == 3) {
-            return BLOCKS_PER_WEEK.mul(3);
-        } else if (_phase == 4) {
-            return BLOCKS_PER_WEEK.mul(4);
-        } else if (_phase == 5) {
-            return BLOCKS_PER_MONTH.mul(2);
-        } else if (_phase == 6) {
-            return BLOCKS_PER_MONTH.mul(3);
+            return BLOCKS_PER_WEEK;
         } else {
-            return BLOCKS_PER_MONTH.mul(4);
+            return BLOCKS_PER_WEEK.mul(2);
         }
     }
 
@@ -71,17 +57,13 @@ contract RewardV2 is RewardV1Template {
         if (_currPhase == 0) {
             return initialRewardPerAmount;
         } else if (_currPhase == 1) {
-            return _base.mul(16);
+            return _base.mul(5);
         } else if (_currPhase == 2) {
-            return _base.mul(12);
-        } else if (_currPhase == 3) {
-            return _base.mul(8);
-        } else if (_currPhase == 4) {
             return _base.mul(4);
-        } else if (_currPhase == 5) {
-            return _base.mul(3);
-        } else {
+        } else if (_currPhase == 3) {
             return _base.mul(2);
+        } else {
+            return _base.mul(1);
         }
     }
 
