@@ -12,8 +12,8 @@ contract RewardV1Mock is RewardV1Template {
     uint256 public constant BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY;
     uint256 public constant BLOCKS_PER_MONTH = 30 * BLOCKS_PER_DAY;
 
-    constructor(address _avatar, address _good, address trustedForwarder)
-        RewardV1Template(_avatar, _good, trustedForwarder) {
+    constructor(address _good, address trustedForwarder)
+        RewardV1Template(_good, trustedForwarder) {
     }
 
     function maxPhase() public override pure returns(uint256) {

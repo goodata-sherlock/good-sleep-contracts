@@ -19,29 +19,29 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
 
     constructor(address trustedForwarder) ERC2771Context(trustedForwarder) {}
 
-    function feed(uint256 tokenId, uint256 amount) public virtual onlyOwner override {
-        _beforeFeed(tokenId, amount);
+    function feed(uint256 tokenId, address owner, uint256 amount) public virtual onlyOwner override {
+        _beforeFeed(tokenId, owner, amount);
         
         uint256 _record = records[tokenId];
         records[tokenId] = _record.add(amount);
         emit Feeding(tokenId, amount);
-        _afterFeed(tokenId, amount);
+        _afterFeed(tokenId, owner, amount);
     }
 
     /**
     * @dev Hook that is called before any feed.
     */
-    function _beforeFeed(uint256 tokenId, uint256 amount) internal virtual {}
+    function _beforeFeed(uint256 tokenId, address owner, uint256 amount) internal virtual {}
 
     /**
     * @dev Hook that is called after any feed.
     */
-    function _afterFeed(uint256 tokenId, uint256 amount) internal virtual {}
+    function _afterFeed(uint256 tokenId, address owner, uint256 amount) internal virtual {}
 
     function batchFeed(FeedParam[] memory params) public virtual onlyOwner override {
         for (uint256 i = 0; i < params.length; i++) {
             FeedParam memory param = params[i];
-            feed(param.tokenId, param.amount);
+            feed(param.tokenId, param.owner, param.amount);
         }
     }
 

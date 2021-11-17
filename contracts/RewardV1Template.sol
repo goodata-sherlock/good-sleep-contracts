@@ -10,11 +10,10 @@ import "./Avatar.sol";
 abstract contract RewardV1Template is Reward, DynamicBlockPhase {
     using SafeMath for uint256;
 
-    Avatar avatar;
     uint256 public avatarCount;
     ERC20 good;
     mapping(uint256 => uint256) pendingReward;
-    mapping(uint256 => bool) isAvatarExist;
+    mapping(uint256 => address) public avatarOwner;
 
     //////////////////////////////////////////////////////////
     // lastBlock & lastBlockPhase updated when              //
@@ -23,29 +22,20 @@ abstract contract RewardV1Template is Reward, DynamicBlockPhase {
     // increasedBlockPhase >= 1                             //
     //////////////////////////////////////////////////////////
 
-    constructor(address _avatar, address _good, address trustedForwarder) Reward(trustedForwarder) {
-        avatar = Avatar(_avatar);
+    constructor(address _good, address trustedForwarder) Reward(trustedForwarder) {
         startBlock = block.number;
         lastBlock = startBlock;
         good = ERC20(_good);
     }
 
-    function _beforeFeed(uint256 tokenId, uint256 amount) internal virtual override {
+    function _beforeFeed(uint256 tokenId, address owner, uint256 amount) internal virtual override {
         // amount validation migrates to backend. There is no amount validation.
-        // require(records[tokenId].add(amount) <= maxAmount(), "RewardV1: out of max amount");
-        bool isExistentAvatar = false;
-        try avatar.ownerOf(tokenId) returns(address _owner) {
-            isExistentAvatar = _owner != address(0);
-        } catch Error(string memory /*reason*/) {
-        } catch (bytes memory /*lowLevelData*/) {
-        }
-        require(isExistentAvatar, "RewardV1: feed nonexistent avatar");
         require(amount != 0, "RewardV1: feed zero amount");
     }
 
-    function _afterFeed(uint256 tokenId, uint256 amount) internal virtual override {
-        if (isAvatarExist[tokenId] == false) {
-            isAvatarExist[tokenId] = true;
+    function _afterFeed(uint256 tokenId, address owner, uint256 amount) internal virtual override {
+        if (avatarOwner[tokenId] == address(0)) {
+            avatarOwner[tokenId] = owner;
             avatarCount = avatarCount.add(1);
         }
         updatePhase();
@@ -114,7 +104,7 @@ abstract contract RewardV1Template is Reward, DynamicBlockPhase {
     }
 
     function _withdraw(uint256 tokenId, uint256 amount) internal override returns(address) {
-        address tokenOwner = avatar.ownerOf(tokenId);
+        address tokenOwner = avatarOwner[tokenId];
         require(tokenOwner == _msgSender(), "RewardV1: token owner is not you");
 
         uint256 pending = reward(tokenId);
