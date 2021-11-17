@@ -85,7 +85,7 @@ contract RewardV1 is RewardV1Template {
         }
     }
 
-    function _estimateReward(uint256 tokenId, uint256 amount) internal virtual override view returns(uint256) {
+    function estimateReward(uint256 tokenId, uint256 amount) public override view returns(uint256) {
         uint256 _oldReward = pendingReward[tokenId];
         // 1 record equals 1 reward.
         return _oldReward.add(amount);

@@ -49,7 +49,7 @@ abstract contract RewardV1Template is Reward, DynamicBlockPhase {
             avatarCount = avatarCount.add(1);
         }
         updatePhase();
-        pendingReward[tokenId] = _estimateReward(tokenId, amount);
+        pendingReward[tokenId] = estimateReward(tokenId, amount);
     }
 
     function updatePhase() public {
@@ -67,7 +67,7 @@ abstract contract RewardV1Template is Reward, DynamicBlockPhase {
     * @dev Increase phase when the number of avatar exceeds range or
     *      time exceeds 1 week in that phase
     */
-    function _phase() internal virtual override view returns(uint256) {
+    function phase() public virtual override view returns(uint256) {
         return _phase(avatarCount);
     }
 
@@ -92,7 +92,7 @@ abstract contract RewardV1Template is Reward, DynamicBlockPhase {
     function avatarNumPhase(uint256 avatarNum) public virtual pure returns(uint256);
 
     function currReward() public view returns(uint256) {
-        return _currReward(_phase());
+        return _currReward(phase());
     }
 
     /**
@@ -100,24 +100,24 @@ abstract contract RewardV1Template is Reward, DynamicBlockPhase {
      */
     function _currReward(uint256 _currPhase) public virtual view returns(uint256);
 
-    function _reward(uint256 tokenId) internal virtual override view returns(uint256) {
+    function reward(uint256 tokenId) public override view returns(uint256) {
         return pendingReward[tokenId];
     }
 
-    function _rewardSurplus() public virtual override view returns(uint256) {
+    function rewardSurplus() public override view returns(uint256) {
         return good.balanceOf(address(this));
     }
 
-    function _estimateReward(uint256 tokenId, uint256 amount) internal virtual override view returns(uint256) {
+    function estimateReward(uint256 tokenId, uint256 amount) public virtual override view returns(uint256) {
         uint256 _oldReward = pendingReward[tokenId];
         return _oldReward.add(amount.mul(currReward()).mul(multiplier).div(10**18));
     }
 
-    function _withdraw(uint256 tokenId, uint256 amount) internal override virtual returns(address) {
+    function _withdraw(uint256 tokenId, uint256 amount) internal override returns(address) {
         address tokenOwner = avatar.ownerOf(tokenId);
         require(tokenOwner == _msgSender(), "RewardV1: token owner is not you");
 
-        uint256 pending = _reward(tokenId);
+        uint256 pending = reward(tokenId);
         require(pending >= amount, "RewardV1: pending reward is not enough");
         pendingReward[tokenId] = pendingReward[tokenId].sub(amount);
 
