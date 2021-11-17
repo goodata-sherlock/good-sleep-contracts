@@ -17,7 +17,7 @@ contract RewardV1 is RewardV1Template {
     }
 
     function maxPhase() public override pure returns(uint256) {
-        return 8;
+        return 9;
     }
 
     function avatarNumPhase(uint256 avatarNum) public override pure returns(uint256) {
@@ -37,8 +37,10 @@ contract RewardV1 is RewardV1Template {
             return 6;
         } else if (avatarNum <= 350000) { // 350k
             return 7;
-        } else { // 500k
-            return maxPhase(); // 8
+        } else if (avatarNum <= 500000) { // 500k
+            return 8;
+        } else { // ~500k
+            return maxPhase(); // 9
         }
     }
 
@@ -50,19 +52,21 @@ contract RewardV1 is RewardV1Template {
         if (_phase == 0) {
             return  BLOCKS_PER_DAY;
         } else if (_phase == 1) {
-            return BLOCKS_PER_WEEK;
+            return BLOCKS_PER_WEEK.sub(BLOCKS_PER_DAY);
         } else if (_phase == 2) {
-            return BLOCKS_PER_WEEK.mul(2);
+            return BLOCKS_PER_WEEK;
         } else if (_phase == 3) {
-            return BLOCKS_PER_WEEK.mul(3);
+            return BLOCKS_PER_WEEK;
         } else if (_phase == 4) {
-            return BLOCKS_PER_WEEK.mul(4);
+            return BLOCKS_PER_WEEK;
         } else if (_phase == 5) {
-            return BLOCKS_PER_MONTH.mul(2);
+            return BLOCKS_PER_MONTH;
         } else if (_phase == 6) {
-            return BLOCKS_PER_MONTH.mul(3);
+            return BLOCKS_PER_MONTH;
+        } else if (_phase == 7) {
+            return BLOCKS_PER_MONTH;
         } else {
-            return BLOCKS_PER_MONTH.mul(4);
+            return BLOCKS_PER_MONTH;
         }
     }
 
