@@ -14,5 +14,11 @@
     "appearanceAvatar": "0xCe897c666c3381bB280aA539d1c0A52647697b12",
     "rewardV1": "0x932160b40488cd0789dBb2D810D143ce566a9Dea",
     "startBlock": 13733228
+  },
+  "hecotestnet": {
+    "good": "0x08A5F71b2C6d05523073ff798d7e17131Eb981a1",
+    "metaTx": "0xF2F2c447bfc30aeE78Eb57Ac26798647a3209238",
+    "rewardV1": "0xAcbCdF001E04163cFCE13eE9252A0E3a0899Cf8B",
+    "startBlock": 10111561
   }
 }
