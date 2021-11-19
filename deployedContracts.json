@@ -8,12 +8,10 @@
     "startBlock": 7676284
   },
   "bsctestnet": {
-    "good": "0xd230f6dbAecB38d485ADAE14D3a8f6A5dC5c3596",
-    "metaTx": "0xFb8235b118b154BE99708663cFaC4405706B2B20",
-    "sleepAvatar": "0x5cF9F740eB944900e5f73591d62de9722d521f49",
-    "appearanceAvatar": "0xCe897c666c3381bB280aA539d1c0A52647697b12",
-    "rewardV1": "0x932160b40488cd0789dBb2D810D143ce566a9Dea",
-    "startBlock": 13733228
+    "good": "0x113D4EB4AFd8CA66de850631ab3bc9cCCed70efC",
+    "metaTx": "0xd12DAf5d0e76b089554cEEAfB1704CcA66a56097",
+    "rewardV1": "0xcA60DCEbE578E9A85a420CACb11a23D1DfcbE07C",
+    "startBlock": 14242836
   },
   "hecotestnet": {
     "good": "0x08A5F71b2C6d05523073ff798d7e17131Eb981a1",

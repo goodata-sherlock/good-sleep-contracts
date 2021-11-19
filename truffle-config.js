@@ -69,7 +69,7 @@ module.exports = {
       gasPrice: 1000000000,  // 1 gwei (in wei) (default: 100 gwei)
     },
     bsctestnet: {
-      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s3.binance.org:8545`),
       networkCheckTimeout: 9999999,
       network_id: 97,       // bsc testnet chain id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
