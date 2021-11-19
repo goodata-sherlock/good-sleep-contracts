@@ -10,7 +10,7 @@ dataSources:
     source:
       address: "0xcA60DCEbE578E9A85a420CACb11a23D1DfcbE07C"
       abi: Reward
-      startBlock: 13733228
+      startBlock: 14242836
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

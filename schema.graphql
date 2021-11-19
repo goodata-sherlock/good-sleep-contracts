@@ -8,7 +8,6 @@ type RewardRecord @entity {
 type FeedRecord @entity {
   id: ID!
   tokenId: BigInt! # uint256
-  to: Bytes! # address, the owner of token
   amount: BigInt! # uint256
   rewardRecord: RewardRecord!
 
