@@ -8,7 +8,7 @@ dataSources:
     name: RewardV1
     network: mainnet
     source:
-      address: "0xcA60DCEbE578E9A85a420CACb11a23D1DfcbE07C"
+      address: "0x1080659A9be3D0Ac0074B3eABEb4158ABE84eBc1"
       abi: Reward
       startBlock: 14242836
     mapping:

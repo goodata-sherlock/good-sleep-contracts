@@ -7,8 +7,8 @@ import "./RewardV1Template.sol";
 contract RewardV1ForTest is RewardV1Template {
     using SafeMath for uint256;
 
-    uint256 public initialRewardPerAmount = 6 * 10**18;
-    uint256 public constant BLOCKS_PER_DAY = 10 * 60 / 3; // 10 minutes
+    uint256 public initialRewardPerAmount = 20 * 10**18;
+    uint256 public constant BLOCKS_PER_DAY = 60 / 3; // 1 minute
     uint256 public constant BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY;
     uint256 public constant BLOCKS_PER_MONTH = 30 * BLOCKS_PER_DAY;
 
@@ -17,20 +17,30 @@ contract RewardV1ForTest is RewardV1Template {
     }
 
     function maxPhase() public override pure returns(uint256) {
-        return 4;
+        return 9;
     }
 
     function avatarNumPhase(uint256 avatarNum) public override pure returns(uint256) {
-        if (avatarNum <= 1) { // 1
+        if (avatarNum <= 1) {
             return 0;
-        } else if (avatarNum <= 2) { // 2
+        } else if (avatarNum <= 2) {
             return 1;
-        } else if (avatarNum <= 3) { // 3
+        } else if (avatarNum <= 3) {
             return 2;
-        } else if (avatarNum <= 4) { // 4
+        } else if (avatarNum <= 4) {
             return 3;
-        } else { // 5
-            return maxPhase(); // 4
+        } else if (avatarNum <= 5) {
+            return 4;
+        } else if (avatarNum <= 6) {
+            return 5;
+        } else if (avatarNum <= 10) {
+            return 6;
+        } else if (avatarNum <= 20) {
+            return 7;
+        } else if (avatarNum <= 30) {
+            return 8;
+        } else {
+            return maxPhase();
         }
     }
 
@@ -40,16 +50,36 @@ contract RewardV1ForTest is RewardV1Template {
 
     function blocksGivenPhase(uint256 _phase) public override pure returns(uint256) {
         if (_phase == 0) {
-            return  BLOCKS_PER_DAY.mul(3);
+            return  BLOCKS_PER_DAY;
         } else if (_phase == 1) {
-            return BLOCKS_PER_DAY.mul(4);
+            return BLOCKS_PER_WEEK.sub(BLOCKS_PER_DAY);
         } else if (_phase == 2) {
-            return BLOCKS_PER_DAY.mul(5);
+            return BLOCKS_PER_WEEK;
         } else if (_phase == 3) {
             return BLOCKS_PER_WEEK;
+        } else if (_phase == 4) {
+            return BLOCKS_PER_WEEK;
+        } else if (_phase == 5) {
+            return BLOCKS_PER_MONTH;
+        } else if (_phase == 6) {
+            return BLOCKS_PER_MONTH;
+        } else if (_phase == 7) {
+            return BLOCKS_PER_MONTH;
         } else {
-            return BLOCKS_PER_WEEK.mul(2);
+            return BLOCKS_PER_MONTH;
         }
+
+        // if (_phase == 0) {
+        //     return  BLOCKS_PER_DAY.mul(3);
+        // } else if (_phase == 1) {
+        //     return BLOCKS_PER_DAY.mul(4);
+        // } else if (_phase == 2) {
+        //     return BLOCKS_PER_DAY.mul(5);
+        // } else if (_phase == 3) {
+        //     return BLOCKS_PER_WEEK;
+        // } else {
+        //     return BLOCKS_PER_WEEK.mul(2);
+        // }
     }
 
     function _currReward(uint256 _currPhase) public override view returns(uint256) {
@@ -57,13 +87,17 @@ contract RewardV1ForTest is RewardV1Template {
         if (_currPhase == 0) {
             return initialRewardPerAmount;
         } else if (_currPhase == 1) {
-            return _base.mul(5);
+            return _base.mul(16);
         } else if (_currPhase == 2) {
-            return _base.mul(4);
+            return _base.mul(12);
         } else if (_currPhase == 3) {
-            return _base.mul(2);
+            return _base.mul(8);
+        } else if (_currPhase == 4) {
+            return _base.mul(4);
+        } else if (_currPhase == 5) {
+            return _base.mul(3);
         } else {
-            return _base.mul(1);
+            return _base.mul(2);
         }
     }
 

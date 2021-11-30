@@ -72,7 +72,7 @@ module.exports = {
       provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s3.binance.org:8545`),
       networkCheckTimeout: 9999999,
       network_id: 97,       // bsc testnet chain id
-      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      confirmations: 0,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       gasPrice: 10000000000,  // 10 gwei (in wei) (default: 100 gwei)
     },
