@@ -94,8 +94,6 @@ contract RewardV1ForTest is RewardV1Template {
             return _base.mul(8);
         } else if (_currPhase == 4) {
             return _base.mul(4);
-        } else if (_currPhase == 5) {
-            return _base.mul(3);
         } else {
             return _base.mul(2);
         }
