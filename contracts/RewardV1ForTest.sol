@@ -50,7 +50,7 @@ contract RewardV1ForTest is RewardV1Template {
 
     function blocksGivenPhase(uint256 _phase) public override pure returns(uint256) {
         if (_phase == 0) {
-            return  BLOCKS_PER_DAY;
+            return  BLOCKS_PER_DAY.mul(15);
         } else if (_phase == 1) {
             return BLOCKS_PER_WEEK.sub(BLOCKS_PER_DAY);
         } else if (_phase == 2) {
