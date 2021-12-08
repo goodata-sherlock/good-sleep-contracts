@@ -82,7 +82,7 @@ module.exports = {
       network_id: 56,     // bsc testnet chain id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-      gasPrice: 10000000000,  // 10 gwei (in wei) (default: 100 gwei)
+      gasPrice: 7000000000,  // 7 gwei (in wei) (default: 100 gwei)
     },
     // Another network with more advanced options...
     // advanced: {
