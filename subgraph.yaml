@@ -8,9 +8,9 @@ dataSources:
     name: RewardV1
     network: mainnet
     source:
-      address: "0xfA576E2466dC5207990F9B6cEAB09A3596CA13aD"
+      address: "0x28505237FBF20E2BB6997C498D925939d74806Db"
       abi: Reward
-      startBlock: 14789798
+      startBlock: 14817368
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
