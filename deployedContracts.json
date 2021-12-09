@@ -8,10 +8,10 @@
     "startBlock": 7676284
   },
   "bsctestnet": {
-    "good": "0xFC05374F60DE8bDFb3cAD256F6152cd1c217636B",
-    "metaTx": "0x5EBEF1A914A118aa5E93f98C5DD6D133fC4d173d",
-    "rewardV1": "0xfA576E2466dC5207990F9B6cEAB09A3596CA13aD",
-    "startBlock": 14789798
+    "good": "0x80Bf051D9c711D5Efd768b23B103Bc64aC55aDe8",
+    "metaTx": "0x6B0bD9E380A929D3Fc72988229C6dc616d4FFa2E",
+    "rewardV1": "0xcB18c2BE0660f64Eb5AA546f031BCfa12E6f8c7D",
+    "startBlock": 14817423
   },
   "hecotestnet": {
     "good": "0x08A5F71b2C6d05523073ff798d7e17131Eb981a1",
