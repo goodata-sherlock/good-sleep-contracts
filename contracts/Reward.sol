@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "./IReward.sol";
+import "./interfaces/IReward.sol";
 
 // MUST inherit ERC2771Context for supporting meta tx.
 abstract contract Reward is IReward, Ownable, ERC2771Context {
@@ -19,62 +19,48 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
 
     constructor(address trustedForwarder) ERC2771Context(trustedForwarder) {}
 
-    function feed(uint256 tokenId, uint256 amount) public virtual onlyOwner override {
-        _beforeFeed(tokenId, amount);
+    function feed(uint256 tokenId, address owner, uint256 amount) public virtual onlyOwner override {
+        _beforeFeed(tokenId, owner, amount);
         
         uint256 _record = records[tokenId];
         records[tokenId] = _record.add(amount);
         emit Feeding(tokenId, amount);
-        _afterFeed(tokenId, amount);
+        _afterFeed(tokenId, owner, amount);
     }
 
     /**
     * @dev Hook that is called before any feed.
     */
-    function _beforeFeed(uint256 tokenId, uint256 amount) internal virtual {}
+    function _beforeFeed(uint256 tokenId, address owner, uint256 amount) internal virtual {}
 
     /**
     * @dev Hook that is called after any feed.
     */
-    function _afterFeed(uint256 tokenId, uint256 amount) internal virtual {}
+    function _afterFeed(uint256 tokenId, address owner, uint256 amount) internal virtual {}
 
     function batchFeed(FeedParam[] memory params) public virtual onlyOwner override {
         for (uint256 i = 0; i < params.length; i++) {
             FeedParam memory param = params[i];
-            feed(param.tokenId, param.amount);
+            feed(param.tokenId, param.owner, param.amount);
         }
     }
 
-    function phase() public override view returns(uint256) {
-        return _phase();
-    }
+    /**
+     * @dev need to implement in child contract.
+     */
+    function phase() public override virtual view returns(uint256);
 
-    function _phase() internal virtual view returns(uint256) {
-        return 0;
-    }
-
-    function reward(uint256 tokenId) public view override returns(uint256) {
-        return _reward(tokenId);
-    }
-
-    function _reward(uint256 tokenId) internal virtual view returns(uint256) {
+    function reward(uint256 tokenId) public virtual view override returns(uint256) {
         uint256 record = records[tokenId];
         return record.sub(lastRewardRecords[tokenId]);
     }
 
-    function rewardSurplus() public view override returns(uint256) {
-        return _rewardSurplus();
-    }
+    /**
+     * @dev need to implement in child contract.
+     */
+    function rewardSurplus() public virtual override view returns(uint256);
 
-    function _rewardSurplus() public virtual view returns(uint256) {
-        return 0;
-    }
-
-    function estimateReward(uint256 tokenId, uint256 amount) public view override returns(uint256) {
-        return _estimateReward(tokenId, amount);
-    }
-
-    function _estimateReward(uint256 tokenId, uint256 amount) internal virtual view returns(uint256) {
+    function estimateReward(uint256 tokenId, uint256 amount) public virtual view override returns(uint256) {
         return records[tokenId].sub(lastRewardRecords[tokenId]).add(amount);
     }
 
@@ -89,6 +75,9 @@ abstract contract Reward is IReward, Ownable, ERC2771Context {
         emit Withdrawal(tokenId, addr, amount);
     }
 
+    /**
+     * @dev need to implement in child contract.
+     */
     function _withdraw(uint256 tokenId, uint256 amount) internal virtual returns(address) {
         lastRewardRecords[tokenId] = records[tokenId];
         return address(0);

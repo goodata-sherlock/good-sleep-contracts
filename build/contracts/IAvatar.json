@@ -1,0 +1,865 @@
+{
+  "contractName": "IAvatar",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "uri",
+          "type": "string"
+        }
+      ],
+      "name": "TokenURIUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "uri",
+          "type": "string"
+        }
+      ],
+      "name": "setTokenURI",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "safeMint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "burn",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "createAvatar",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCurrTokenId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.0+commit.c7dfd78e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"uri\",\"type\":\"string\"}],\"name\":\"TokenURIUpdated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"createAvatar\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrTokenId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"safeMint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"uri\",\"type\":\"string\"}],\"name\":\"setTokenURI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/thestar/Development/go/src/work/goodata/good-sleep-contracts/contracts/interfaces/IAvatar.sol\":\"IAvatar\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/thestar/Development/go/src/work/goodata/good-sleep-contracts/contracts/interfaces/IAvatar.sol\":{\"keccak256\":\"0x6a35d3f6cb7715fd587a600e48d574c88eb77e2236f67c94f817b04d9d14f756\",\"license\":\"GPL3.0\",\"urls\":[\"bzz-raw://41a18f52e122e3dbdb8af343a95e431edfa26ab5812b1a9cb416c9e9e7b497a1\",\"dweb:/ipfs/QmNNM4gMwkeKzG2b5mFSffj53rSbDsPBeMjkukQjTC8pee\"]},\"@openzeppelin/contracts/token/ERC721/IERC721.sol\":{\"keccak256\":\"0xf101e8720213560fab41104d53b3cc7ba0456ef3a98455aa7f022391783144a0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://3e7820bcf567e6892d937c3cb10db263a4042e446799bca602535868d822384e\",\"dweb:/ipfs/QmPG2oeDjKncqsEeyYGjAN7CwAJmMgHterXGGnpzhha4z7\"]},\"@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol\":{\"keccak256\":\"0xd32fb7f530a914b1083d10a6bed3a586f2451952fec04fe542bcc670a82f7ba5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://af63ab940a34687c45f0ad84960b048fc5f49330c92ccb422db7822a444733b9\",\"dweb:/ipfs/QmUShaQEu8HS1GjDnsMJQ8jkZEBrecn6NuDZ3pfjY1gVck\"]},\"@openzeppelin/contracts/utils/introspection/IERC165.sol\":{\"keccak256\":\"0xa28007762d9da9db878dd421960c8cb9a10471f47ab5c1b3309bfe48e9e79ff4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://796ab6e88af7bf0e78def0f059310c903af6a312b565344e0ff524a0f26e81c6\",\"dweb:/ipfs/QmcsVgLgzWdor3UnAztUkXKNGcysm1MPneWksF72AvnwBx\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: GPL3.0\npragma solidity ^0.8.0;\n\nimport \"@openzeppelin/contracts/token/ERC721/IERC721.sol\";\nimport \"@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol\";\n\n\n// interface IAvatar is IERC721, IERC721Metadata {\ninterface IAvatar {\n    event TokenURIUpdated(uint256 indexed tokenId, string uri);\n\n    function setTokenURI(uint256 tokenId, string memory uri) external;\n    function safeMint() external;\n    function burn(uint256 tokenId) external;\n\n    function createAvatar() external;\n    function getCurrTokenId() external view returns (uint256);\n}\n",
+  "sourcePath": "/Users/thestar/Development/go/src/work/goodata/good-sleep-contracts/contracts/interfaces/IAvatar.sol",
+  "ast": {
+    "absolutePath": "/Users/thestar/Development/go/src/work/goodata/good-sleep-contracts/contracts/interfaces/IAvatar.sol",
+    "exportedSymbols": {
+      "IAvatar": [
+        2217
+      ],
+      "IERC165": [
+        5647
+      ],
+      "IERC721": [
+        4381
+      ],
+      "IERC721Metadata": [
+        4584
+      ]
+    },
+    "id": 2218,
+    "license": "GPL3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2185,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "35:23:17"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "file": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "id": 2186,
+        "nodeType": "ImportDirective",
+        "scope": 2218,
+        "sourceUnit": 4382,
+        "src": "60:58:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "file": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "id": 2187,
+        "nodeType": "ImportDirective",
+        "scope": 2218,
+        "sourceUnit": 4585,
+        "src": "119:77:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 2217,
+        "linearizedBaseContracts": [
+          2217
+        ],
+        "name": "IAvatar",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "id": 2193,
+            "name": "TokenURIUpdated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2192,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2189,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2193,
+                  "src": "296:23:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2188,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "296:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2191,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "uri",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2193,
+                  "src": "321:10:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 2190,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "321:6:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "295:37:17"
+            },
+            "src": "274:59:17"
+          },
+          {
+            "functionSelector": "162094c4",
+            "id": 2200,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setTokenURI",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2198,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2195,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2200,
+                  "src": "360:15:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2194,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "360:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2197,
+                  "mutability": "mutable",
+                  "name": "uri",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2200,
+                  "src": "377:17:17",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 2196,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "377:6:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "359:36:17"
+            },
+            "returnParameters": {
+              "id": 2199,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "404:0:17"
+            },
+            "scope": 2217,
+            "src": "339:66:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "6871ee40",
+            "id": 2203,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "safeMint",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2201,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "427:2:17"
+            },
+            "returnParameters": {
+              "id": 2202,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "438:0:17"
+            },
+            "scope": 2217,
+            "src": "410:29:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "42966c68",
+            "id": 2208,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burn",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2206,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2205,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2208,
+                  "src": "458:15:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2204,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "458:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "457:17:17"
+            },
+            "returnParameters": {
+              "id": 2207,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "483:0:17"
+            },
+            "scope": 2217,
+            "src": "444:40:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "5e5cd13a",
+            "id": 2211,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "createAvatar",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2209,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "511:2:17"
+            },
+            "returnParameters": {
+              "id": 2210,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "522:0:17"
+            },
+            "scope": 2217,
+            "src": "490:33:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "5938dcd3",
+            "id": 2216,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCurrTokenId",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2212,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "551:2:17"
+            },
+            "returnParameters": {
+              "id": 2215,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2214,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2216,
+                  "src": "577:7:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2213,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "577:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "576:9:17"
+            },
+            "scope": 2217,
+            "src": "528:58:17",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 2218,
+        "src": "250:338:17"
+      }
+    ],
+    "src": "35:554:17"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/thestar/Development/go/src/work/goodata/good-sleep-contracts/contracts/interfaces/IAvatar.sol",
+    "exportedSymbols": {
+      "IAvatar": [
+        2217
+      ],
+      "IERC165": [
+        5647
+      ],
+      "IERC721": [
+        4381
+      ],
+      "IERC721Metadata": [
+        4584
+      ]
+    },
+    "id": 2218,
+    "license": "GPL3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2185,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "35:23:17"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "file": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+        "id": 2186,
+        "nodeType": "ImportDirective",
+        "scope": 2218,
+        "sourceUnit": 4382,
+        "src": "60:58:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "file": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "id": 2187,
+        "nodeType": "ImportDirective",
+        "scope": 2218,
+        "sourceUnit": 4585,
+        "src": "119:77:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 2217,
+        "linearizedBaseContracts": [
+          2217
+        ],
+        "name": "IAvatar",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "id": 2193,
+            "name": "TokenURIUpdated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2192,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2189,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2193,
+                  "src": "296:23:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2188,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "296:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2191,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "uri",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2193,
+                  "src": "321:10:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 2190,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "321:6:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "295:37:17"
+            },
+            "src": "274:59:17"
+          },
+          {
+            "functionSelector": "162094c4",
+            "id": 2200,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setTokenURI",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2198,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2195,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2200,
+                  "src": "360:15:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2194,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "360:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2197,
+                  "mutability": "mutable",
+                  "name": "uri",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2200,
+                  "src": "377:17:17",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 2196,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "377:6:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "359:36:17"
+            },
+            "returnParameters": {
+              "id": 2199,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "404:0:17"
+            },
+            "scope": 2217,
+            "src": "339:66:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "6871ee40",
+            "id": 2203,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "safeMint",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2201,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "427:2:17"
+            },
+            "returnParameters": {
+              "id": 2202,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "438:0:17"
+            },
+            "scope": 2217,
+            "src": "410:29:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "42966c68",
+            "id": 2208,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "burn",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2206,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2205,
+                  "mutability": "mutable",
+                  "name": "tokenId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2208,
+                  "src": "458:15:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2204,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "458:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "457:17:17"
+            },
+            "returnParameters": {
+              "id": 2207,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "483:0:17"
+            },
+            "scope": 2217,
+            "src": "444:40:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "5e5cd13a",
+            "id": 2211,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "createAvatar",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2209,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "511:2:17"
+            },
+            "returnParameters": {
+              "id": 2210,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "522:0:17"
+            },
+            "scope": 2217,
+            "src": "490:33:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "5938dcd3",
+            "id": 2216,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCurrTokenId",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2212,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "551:2:17"
+            },
+            "returnParameters": {
+              "id": 2215,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2214,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2216,
+                  "src": "577:7:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2213,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "577:7:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "576:9:17"
+            },
+            "scope": 2217,
+            "src": "528:58:17",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 2218,
+        "src": "250:338:17"
+      }
+    ],
+    "src": "35:554:17"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-12-08T08:18:04.048Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

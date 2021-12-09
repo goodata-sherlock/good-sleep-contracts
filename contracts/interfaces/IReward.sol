@@ -9,10 +9,11 @@ interface IReward {
 
     struct FeedParam {
         uint256 tokenId;
+        address owner;
         uint256 amount;
     }
 
-    function feed(uint256 tokenId, uint256 amount) external;
+    function feed(uint256 tokenId, address owner, uint256 amount) external;
     function batchFeed(FeedParam[] memory params) external;
     
     function phase() external view returns(uint256);

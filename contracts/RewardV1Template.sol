@@ -3,57 +3,43 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./DynamicBlockPhase.sol";
 import "./Reward.sol";
 import "./Avatar.sol";
 
-contract RewardV1Template is Reward {
+abstract contract RewardV1Template is Reward, DynamicBlockPhase {
     using SafeMath for uint256;
 
-    event BlockPhaseUpdated(uint256 lastBlock, uint256 phase);
-
-    Avatar avatar;
     uint256 public avatarCount;
     ERC20 good;
     mapping(uint256 => uint256) pendingReward;
-    mapping(uint256 => bool) isAvatarExist;
-    uint256 public startBlock;
+    mapping(uint256 => address) public avatarOwner;
 
     //////////////////////////////////////////////////////////
-    // updated when                                         //
+    // lastBlock & lastBlockPhase updated when              //
     // avatarNumPhase > blockPhase                          //
     // or                                                   //
-    // (currBlock - lastBlock) / BLOCKS_PER_PHASE >= 1      //
-    uint256 public lastBlock;                               //
-    uint256 public lastBlockPhase;                          //
+    // increasedBlockPhase >= 1                             //
     //////////////////////////////////////////////////////////
 
-    constructor(address _avatar, address _good, address trustedForwarder) Reward(trustedForwarder) {
-        avatar = Avatar(_avatar);
+    constructor(address _good, address trustedForwarder) Reward(trustedForwarder) {
         startBlock = block.number;
         lastBlock = startBlock;
         good = ERC20(_good);
     }
 
-    function _beforeFeed(uint256 tokenId, uint256 amount) internal virtual override {
+    function _beforeFeed(uint256 tokenId, address owner, uint256 amount) internal virtual override {
         // amount validation migrates to backend. There is no amount validation.
-        // require(records[tokenId].add(amount) <= maxAmount(), "RewardV1: out of max amount");
-        bool isExistentAvatar = false;
-        try avatar.ownerOf(tokenId) returns(address _owner) {
-            isExistentAvatar = _owner != address(0);
-        } catch Error(string memory /*reason*/) {
-        } catch (bytes memory /*lowLevelData*/) {
-        }
-        require(isExistentAvatar, "RewardV1: feed nonexistent avatar");
         require(amount != 0, "RewardV1: feed zero amount");
     }
 
-    function _afterFeed(uint256 tokenId, uint256 amount) internal virtual override {
-        if (isAvatarExist[tokenId] == false) {
-            isAvatarExist[tokenId] = true;
+    function _afterFeed(uint256 tokenId, address owner, uint256 amount) internal virtual override {
+        if (avatarOwner[tokenId] == address(0)) {
+            avatarOwner[tokenId] = owner;
             avatarCount = avatarCount.add(1);
         }
         updatePhase();
-        pendingReward[tokenId] = _estimateReward(tokenId, amount);
+        pendingReward[tokenId] = estimateReward(tokenId, amount);
     }
 
     function updatePhase() public {
@@ -67,20 +53,11 @@ contract RewardV1Template is Reward {
         }
     }
 
-    function updateBlockPhase() internal {
-        uint256 phaseNum = increasedBlockPhaseNum();
-        if (phaseNum >= 1) {
-            lastBlockPhase = lastBlockPhase.add(phaseNum);
-            lastBlock = lastBlock.add(phaseNum * blocksPerPhase()); // rather than lastBlock = block.number
-            emit BlockPhaseUpdated(lastBlock, lastBlockPhase);
-        }
-    }
-
     /** 
     * @dev Increase phase when the number of avatar exceeds range or
     *      time exceeds 1 week in that phase
     */
-    function _phase() internal virtual override view returns(uint256) {
+    function phase() public virtual override view returns(uint256) {
         return _phase(avatarCount);
     }
 
@@ -91,65 +68,46 @@ contract RewardV1Template is Reward {
     }
 
     /**
-    * @dev need to implement in child contract.
+     * @dev need to implement in child contract.
      */
-    function maxPhse() public virtual pure returns(uint256) {
-        return 7;
+    function maxPhase() public virtual pure returns(uint256);
+
+    function maxBlockPhase() public override virtual pure returns(uint256) {
+        return maxPhase();
     }
 
     /**
-    * @dev need to implement in child contract.
+     * @dev need to implement in child contract.
      */
-    function avatarNumPhase(uint256 avatarNum) public virtual pure returns(uint256) {
-        return 0;
-    }
-
-    function increasedBlockPhaseNum() public view returns(uint256) {
-        uint256 phaseNum = (block.number.sub(lastBlock)).div(blocksPerPhase());
-        phaseNum = phaseNum.add(lastBlockPhase) <= maxPhse()? phaseNum: 0;
-        return phaseNum;
-    }
-
-    function blockPhase() public view returns(uint256) {
-        return lastBlockPhase.add(increasedBlockPhaseNum());
-    }
-
-    /**
-    * @dev need to implement in child contract.
-     */
-    function blocksPerPhase() public virtual pure returns(uint256) {
-        return 10000;
-    }
+    function avatarNumPhase(uint256 avatarNum) public virtual pure returns(uint256);
 
     function currReward() public view returns(uint256) {
-        return _currReward(_phase());
+        return _currReward(phase());
     }
 
     /**
-    * @dev need to implement in child contract.
+     * @dev need to implement in child contract.
      */
-    function _currReward(uint256 _currPhase) public virtual view returns(uint256) {
-        return 1*10**18;
-    }
+    function _currReward(uint256 _currPhase) public virtual view returns(uint256);
 
-    function _reward(uint256 tokenId) internal virtual override view returns(uint256) {
+    function reward(uint256 tokenId) public override view returns(uint256) {
         return pendingReward[tokenId];
     }
 
-    function _rewardSurplus() public virtual override view returns(uint256) {
+    function rewardSurplus() public override view returns(uint256) {
         return good.balanceOf(address(this));
     }
 
-    function _estimateReward(uint256 tokenId, uint256 amount) internal virtual override view returns(uint256) {
+    function estimateReward(uint256 tokenId, uint256 amount) public virtual override view returns(uint256) {
         uint256 _oldReward = pendingReward[tokenId];
         return _oldReward.add(amount.mul(currReward()).mul(multiplier).div(10**18));
     }
 
-    function _withdraw(uint256 tokenId, uint256 amount) internal override virtual returns(address) {
-        address tokenOwner = avatar.ownerOf(tokenId);
+    function _withdraw(uint256 tokenId, uint256 amount) internal override returns(address) {
+        address tokenOwner = avatarOwner[tokenId];
         require(tokenOwner == _msgSender(), "RewardV1: token owner is not you");
 
-        uint256 pending = _reward(tokenId);
+        uint256 pending = reward(tokenId);
         require(pending >= amount, "RewardV1: pending reward is not enough");
         pendingReward[tokenId] = pendingReward[tokenId].sub(amount);
 

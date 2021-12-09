@@ -192,6 +192,11 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
@@ -210,6 +215,11 @@
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
           },
           {
             "internalType": "uint256",
@@ -262,19 +272,6 @@
   {
     "inputs": [],
     "name": "rewardSurplus",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "_rewardSurplus",
     "outputs": [
       {
         "internalType": "uint256",

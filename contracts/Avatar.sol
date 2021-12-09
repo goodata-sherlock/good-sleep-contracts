@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-import "./IAvatar.sol";
+import "./interfaces/IAvatar.sol";
 
 abstract contract Avatar is ERC2771Context, ERC721, ERC721URIStorage, ERC721Burnable, IAvatar {
     using Strings for uint256;

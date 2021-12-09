@@ -1,6 +1,5 @@
 const MetaTx = artifacts.require('MetaTx')
 const MockGooD = artifacts.require('MockGooD')
-const SleepAvatar = artifacts.require('SleepAvatar')
 const AppearanceAvatar = artifacts.require('AppearanceAvatar')
 const RewardV1 = artifacts.require('RewardV1')
 const RewardV1ForTest = artifacts.require('RewardV1ForTest')
@@ -20,8 +19,6 @@ module.exports = async (deployer, network) => {
 let deployedContracts = {
     good: '',
     metaTx: '',
-    sleepAvatar: '',
-    appearanceAvatar: '',
     rewardV1: '',
     startBlock: 0,
 }
@@ -49,17 +46,11 @@ const deployContractsInMainnet = async (deployer, goodAddr) => {
     let metaTx = await MetaTx.deployed()
     deployedContracts.metaTx = metaTx.address
 
-    await deployer.deploy(SleepAvatar, metaTx.address)
-    let sleepAvatar = await SleepAvatar.deployed()
-    deployedContracts.sleepAvatar = sleepAvatar.address
-
     await deployer.deploy(AppearanceAvatar, metaTx.address)
-    let appearanceAvatar = await AppearanceAvatar.deployed()
-    deployedContracts.appearanceAvatar = appearanceAvatar.address
 
     deployedContracts.good = goodAddr
 
-    await deployer.deploy(RewardV1, sleepAvatar.address, goodAddr, metaTx.address)
+    await deployer.deploy(RewardV1, goodAddr, metaTx.address)
     let rewardV1 = await RewardV1.deployed()
     deployedContracts.rewardV1 = rewardV1.address
 }
@@ -73,15 +64,7 @@ const deployContractsInTestnet = async (deployer) => {
     let metaTx = await MetaTx.deployed()
     deployedContracts.metaTx = metaTx.address
 
-    await deployer.deploy(SleepAvatar, metaTx.address)
-    let sleepAvatar = await SleepAvatar.deployed()
-    deployedContracts.sleepAvatar = sleepAvatar.address
-
-    await deployer.deploy(AppearanceAvatar, metaTx.address)
-    let appearanceAvatar = await AppearanceAvatar.deployed()
-    deployedContracts.appearanceAvatar = appearanceAvatar.address
-
-    await deployer.deploy(RewardV1ForTest, sleepAvatar.address, good.address, metaTx.address)
+    await deployer.deploy(RewardV1ForTest, good.address, metaTx.address)
     let rewardV1 = await RewardV1ForTest.deployed()
     deployedContracts.rewardV1 = rewardV1.address
 
@@ -89,14 +72,7 @@ const deployContractsInTestnet = async (deployer) => {
     await good.transfer(rewardV1.address, toWei('100000000'))
 
     // Add some test datas
-    for (let i = 1; i < 5; i++) {
-        await sleepAvatar.createAvatar()
-        rewardV1.feed(''+i, ''+i)
+    for (let i = 1; i < 2; i++) {
+        rewardV1.feed(''+i, (await web3.eth.getAccounts())[0], ''+i)
     }
-
-    for (let i = 1; i< 4; i++) {
-        await appearanceAvatar.createAvatar()
-    }
-
-    await rewardV1.withdraw('2', toWei('1'))
 }

@@ -54,6 +54,7 @@ module.exports = {
     },
     hecotestnet: {
       provider: () => new HDWalletProvider(mnemonic, `https://http-testnet.hecochain.com`),
+      networkCheckTimeout: 9999999,
       network_id: 256,       // heco testnet chain id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
@@ -61,24 +62,27 @@ module.exports = {
     },
     hecomainnet: {
       provider: () => new HDWalletProvider(mnemonic, `https://http-mainnet-node.huobichain.com`),
+      networkCheckTimeout: 9999999,
       network_id: 128,     // heco testnet chain id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       gasPrice: 1000000000,  // 1 gwei (in wei) (default: 100 gwei)
     },
     bsctestnet: {
-      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s2.binance.org:8545`),
+      networkCheckTimeout: 9999999,
       network_id: 97,       // bsc testnet chain id
-      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      confirmations: 0,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       gasPrice: 10000000000,  // 10 gwei (in wei) (default: 100 gwei)
     },
     bscmainnet: {
       provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed.binance.org`),
+      networkCheckTimeout: 9999999,
       network_id: 56,     // bsc testnet chain id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-      gasPrice: 10000000000,  // 10 gwei (in wei) (default: 100 gwei)
+      gasPrice: 7000000000,  // 7 gwei (in wei) (default: 100 gwei)
     },
     // Another network with more advanced options...
     // advanced: {

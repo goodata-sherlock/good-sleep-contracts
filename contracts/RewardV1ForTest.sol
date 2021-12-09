@@ -7,48 +7,101 @@ import "./RewardV1Template.sol";
 contract RewardV1ForTest is RewardV1Template {
     using SafeMath for uint256;
 
-    uint256 public initialRewardPerAmount = 6 * 10**18;
+    uint256 public initialRewardPerAmount = 20 * 10**18;
+    uint256 public constant BLOCKS_PER_DAY = 60 / 3; // 1 minute
+    uint256 public constant BLOCKS_PER_WEEK = 7 * BLOCKS_PER_DAY;
+    uint256 public constant BLOCKS_PER_MONTH = 30 * BLOCKS_PER_DAY;
 
-    constructor(address _avatar, address _good, address trustedForwarder)
-        RewardV1Template(_avatar, _good, trustedForwarder) {
+    constructor(address _good, address trustedForwarder)
+        RewardV1Template(_good, trustedForwarder) {
     }
 
-    function maxPhse() public override pure returns(uint256) {
-        return 7;
-    }
-
-    function blocksPerPhase() public override pure returns(uint256) {
-        return 28;
+    function maxPhase() public override pure returns(uint256) {
+        return 9;
     }
 
     function avatarNumPhase(uint256 avatarNum) public override pure returns(uint256) {
-        if (avatarNum <= 3) {
+        if (avatarNum <= 1) {
             return 0;
-        } else if (avatarNum <= 4) {
+        } else if (avatarNum <= 2) {
             return 1;
-        } else if (avatarNum <= 5) {
+        } else if (avatarNum <= 3) {
             return 2;
-        } else if (avatarNum <= 6) {
+        } else if (avatarNum <= 4) {
             return 3;
-        } else if (avatarNum <= 7) {
+        } else if (avatarNum <= 5) {
             return 4;
-        } else if (avatarNum <= 8) {
+        } else if (avatarNum <= 6) {
             return 5;
-        } else if (avatarNum <= 9) {
+        } else if (avatarNum <= 10) {
             return 6;
-        } else { // <= 10
-            return maxPhse(); // 7
+        } else if (avatarNum <= 20) {
+            return 7;
+        } else if (avatarNum <= 30) {
+            return 8;
+        } else {
+            return maxPhase();
         }
+    }
+
+    function blocksOfCurrPhase() public override view returns(uint256) {
+        return blocksGivenPhase(lastBlockPhase);
+    }
+
+    function blocksGivenPhase(uint256 _phase) public override pure returns(uint256) {
+        if (_phase == 0) {
+            return  BLOCKS_PER_DAY.mul(15);
+        } else if (_phase == 1) {
+            return BLOCKS_PER_WEEK.sub(BLOCKS_PER_DAY);
+        } else if (_phase == 2) {
+            return BLOCKS_PER_WEEK;
+        } else if (_phase == 3) {
+            return BLOCKS_PER_WEEK;
+        } else if (_phase == 4) {
+            return BLOCKS_PER_WEEK;
+        } else if (_phase == 5) {
+            return BLOCKS_PER_MONTH;
+        } else if (_phase == 6) {
+            return BLOCKS_PER_MONTH;
+        } else if (_phase == 7) {
+            return BLOCKS_PER_MONTH;
+        } else {
+            return BLOCKS_PER_MONTH;
+        }
+
+        // if (_phase == 0) {
+        //     return  BLOCKS_PER_DAY.mul(3);
+        // } else if (_phase == 1) {
+        //     return BLOCKS_PER_DAY.mul(4);
+        // } else if (_phase == 2) {
+        //     return BLOCKS_PER_DAY.mul(5);
+        // } else if (_phase == 3) {
+        //     return BLOCKS_PER_WEEK;
+        // } else {
+        //     return BLOCKS_PER_WEEK.mul(2);
+        // }
     }
 
     function _currReward(uint256 _currPhase) public override view returns(uint256) {
         uint256 _base = 1*10**18;
-        if (_currPhase < 4) {
-            return initialRewardPerAmount.sub(_base.mul(_currPhase));
-        } else if (_currPhase < 6) {
-            return 2*10**18; // 2
+        if (_currPhase == 0) {
+            return initialRewardPerAmount;
+        } else if (_currPhase == 1) {
+            return _base.mul(16);
+        } else if (_currPhase == 2) {
+            return _base.mul(12);
+        } else if (_currPhase == 3) {
+            return _base.mul(8);
+        } else if (_currPhase == 4) {
+            return _base.mul(4);
         } else {
-            return 15*10**17; // 1.5
+            return _base.mul(2);
         }
+    }
+
+    function estimateReward(uint256 tokenId, uint256 amount) public override view returns(uint256) {
+        uint256 _oldReward = pendingReward[tokenId];
+        // 1 record equals 1 reward.
+        return _oldReward.add(amount);
     }
 }
